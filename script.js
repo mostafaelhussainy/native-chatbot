@@ -107,28 +107,36 @@ chatbotToggler.addEventListener("click", () =>
   document.body.classList.toggle("show-chatbot")
 );
 
-// Text to be typed
-const textToType = "Hello, world! This is a typewriter effect.";
+/************/
+// Updated typeWriter function with parameters to handle HTML content
+function typeWriter(targetElement, textContent, speed) {
+  let charIndex = 0;
+
+  function type() {
+    if (charIndex < textContent.length) {
+      // Append the next character or HTML tag to the target element
+      targetElement.innerHTML += textContent.charAt(charIndex);
+      charIndex++;
+      // Call the function recursively after a delay
+      setTimeout(type, speed);
+    }
+  }
+
+  // Start typing when the function is called
+  type();
+}
+
+// Get the target element where the text will be typed
+const textElement = document.getElementById("typewriter-text");
+
+// Text to be typed, including HTML elements
+const textToType = "Hello, This is a typewriter effect.";
 
 // Time delay between typing each character (in milliseconds)
 const typingSpeed = 100;
 
-// Get the element where the text will be typed
-const textElement = document.getElementById("typewriter-text");
-
-// Initialize variables
-let charIndex = 0;
-
-// Function to simulate typing
-function typeWriter() {
-  if (charIndex < textToType.length) {
-    // Append the next character to the text element
-    textElement.innerHTML += textToType.charAt(charIndex);
-    charIndex++;
-    // Call the function recursively after a delay
-    setTimeout(typeWriter, typingSpeed);
-  }
-}
-
 // Start typing when the page loads
-document.addEventListener("DOMContentLoaded", typeWriter);
+document.addEventListener(
+  "DOMContentLoaded",
+  typeWriter(textElement, textToType, typingSpeed)
+);
