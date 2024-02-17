@@ -1,12 +1,12 @@
 // Selecting elements from the DOM
 const chatbotToggler = document.querySelector(".chatbot-toggler");
 const closeBtn = document.querySelector(".close-btn");
-const chatbox = document.querySelector(".chatbox");
+const chatBox = document.querySelector(".chat-box");
 const chatInput = document.querySelector(".chat-input textarea");
 const sendChatBtn = document.querySelector("#send-btn");
 let userMessage = null; // Variable to store user's message
 const API_KEY = "PASTE-YOUR-API-KEY"; // Placeholder for your API key
-const inputInitHeight = chatInput.scrollHeight;
+const inputInitialHeight = chatInput.scrollHeight; // use to resize the userInput back to what it was after sending a value
 
 // Function to create a new chat message element
 const createChatLi = (message, className) => {
@@ -15,8 +15,8 @@ const createChatLi = (message, className) => {
   let chatContent;
   if (className === "outgoing") {
     chatContent = `<p>${message}</p>`; // Outgoing messages don't need an icon
-  } else {
-    // For incoming messages, add the FontAwesome robot icon
+  } else if (className === "incoming") {
+    // For incoming messages, add the animated thinking indicator
     chatContent = `<i class="fa-solid fa-robot"></i><p>${message}</p>`;
   }
   chatLi.innerHTML = chatContent;
@@ -27,6 +27,10 @@ const createChatLi = (message, className) => {
 const generateResponse = (chatElement) => {
   const API_URL = "https://api.openai.com/v1/chat/completions";
   const messageElement = chatElement.querySelector("p");
+
+  // Add loading indicator
+  messageElement.innerHTML =
+    '<span class="typing-indicator"><span class="dot"></span></span>';
 
   // Define the properties and message for the API request
   const requestOptions = {
@@ -45,14 +49,14 @@ const generateResponse = (chatElement) => {
   fetch(API_URL, requestOptions)
     .then((res) => res.json())
     .then((data) => {
-      messageElement.textContent = data.choices[0].message.content.trim();
+      messageElement.textContent = data.choices[0].message.content.trim(); // here customize the response depending on the response
     })
     .catch(() => {
       messageElement.classList.add("error");
       messageElement.textContent =
-        "Oops! Something went wrong. Please try again.";
+        "Oops! Something went wrong. Please try again."; // here you might went to redirect back to the opening message
     })
-    .finally(() => chatbox.scrollTo(0, chatbox.scrollHeight));
+    .finally(() => chatBox.scrollTo(0, chatBox.scrollHeight));
 };
 
 // Function to handle user input and initiate chatbot response
@@ -61,17 +65,17 @@ const handleChat = () => {
   if (!userMessage) return;
 
   chatInput.value = ""; // Clear the input textarea
-  chatInput.style.height = `${inputInitHeight}px`; // Reset textarea height
+  chatInput.style.height = `${inputInitialHeight}px`; // Reset textarea height
 
-  // Append the user's message to the chatbox
-  chatbox.appendChild(createChatLi(userMessage, "outgoing"));
-  chatbox.scrollTo(0, chatbox.scrollHeight);
+  // Append the user's message to the chatBox
+  chatBox.appendChild(createChatLi(userMessage, "outgoing"));
+  chatBox.scrollTo(0, chatBox.scrollHeight);
 
   // Simulate a delay for bot response
   setTimeout(() => {
     const incomingChatLi = createChatLi("Thinking...", "incoming");
-    chatbox.appendChild(incomingChatLi);
-    chatbox.scrollTo(0, chatbox.scrollHeight);
+    chatBox.appendChild(incomingChatLi);
+    chatBox.scrollTo(0, chatBox.scrollHeight);
     generateResponse(incomingChatLi);
   }, 600);
 };
@@ -102,3 +106,29 @@ closeBtn.addEventListener("click", () =>
 chatbotToggler.addEventListener("click", () =>
   document.body.classList.toggle("show-chatbot")
 );
+
+// Text to be typed
+const textToType = "Hello, world! This is a typewriter effect.";
+
+// Time delay between typing each character (in milliseconds)
+const typingSpeed = 100;
+
+// Get the element where the text will be typed
+const textElement = document.getElementById("typewriter-text");
+
+// Initialize variables
+let charIndex = 0;
+
+// Function to simulate typing
+function typeWriter() {
+  if (charIndex < textToType.length) {
+    // Append the next character to the text element
+    textElement.innerHTML += textToType.charAt(charIndex);
+    charIndex++;
+    // Call the function recursively after a delay
+    setTimeout(typeWriter, typingSpeed);
+  }
+}
+
+// Start typing when the page loads
+document.addEventListener("DOMContentLoaded", typeWriter);

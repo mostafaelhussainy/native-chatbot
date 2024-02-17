@@ -21,6 +21,8 @@
     <script src="script.js" defer></script>
   </head>
   <body>
+    <div id="typewriter-text"></div>
+
     <button class="chatbot-toggler">
       <i class="fa-solid fa-comments"></i>
       <i class="fa-solid fa-xmark"></i>
@@ -30,17 +32,12 @@
         <h2>ESS Chatbot</h2>
         <i class="close-btn fa-solid fa-xmark"></i>
       </header>
-      <ul class="chatbox">
+      <ul class="chat-box">
         <li class="chat incoming">
           <i class="fa-solid fa-robot"></i>
           <p>Hi there 👋<br />How can I help you today?</p>
         </li>
       </ul>
-      <div class="typing hidden">
-        <div class="typing__dot"></div>
-        <div class="typing__dot"></div>
-        <div class="typing__dot"></div>
-      </div>
       <div class="chat-input">
         <textarea
           placeholder="Enter a message..."
