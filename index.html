@@ -17,17 +17,20 @@
                 <i class="fa-solid fa-comments"></i>
                 <i class="fa-solid fa-xmark"></i>
             </button>
+
             <div class="chatbot">
                 <header>
                     <h2>ESS Chatbot</h2>
-                    <i class="close-btn fa-solid fa-xmark"></i>
                 </header>
                 <ul class="chat-box">
-                    <li class="chat incoming"><i class="fa-solid fa-robot"></i></li>
+                    <li class="chat incoming"></li>
                 </ul>
                 <div class="chat-input">
                     <textarea spellcheck="false" disabled required></textarea>
                     <i id="send-btn" class="fa-solid fa-paper-plane"></i>
+                    <label id="send-attachments">
+                        <input type="file" />
+                    </label>
                 </div>
             </div>
         </div>
