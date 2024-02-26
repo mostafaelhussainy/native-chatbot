@@ -206,18 +206,6 @@ $(document).ready(function () {
     };
 
     const handleInsertingSelect = async (module, step, chatWrapper) => {
-        // step3: {
-        //     message: "Please choose your leave type",
-        //     type: "options",
-        //     name: "leave type",
-        //     key: "leaveType",
-        //     options: [
-        //         { value: "Type 1", text: "Type 1" },
-        //         { value: "Type 2", text: "Type 2" },
-        //         { value: "Type 3", text: "Type 3" },
-        //     ],
-        // },
-
         const stepKey = `step${step}`;
         const defaultOptionText = "Select one option";
         const optionsList = module.moduleSteps[stepKey].options || "Select one option";
@@ -240,16 +228,16 @@ $(document).ready(function () {
             $(selectElement).prop("disabled", true).trigger("chosen:updated");
             handleMessageInsertion(params.selected, "outgoing");
             saveRequestInSessionStorage(
-                "userLeaveTypeRequest",
-                "leaveType",
-                "leave type",
+                module.moduleKey,
+                module.moduleSteps[stepKey].key,
+                module.moduleSteps[stepKey].name,
                 params.selected
             );
 
             const nextStepKey = `step${step + 1}`;
-            if (!module.moduleSteps[stepKey]) return;
-            // mostafa -> here we need to make the function generic based on the next step type, also don't forget to change the keys that the stored in session storage
-            await nextStepFunction(); // next step
+            if (!module.moduleSteps[nextStepKey]) return;
+
+            handleModuleStepsCalls(module, step + 1);
         });
 
         return selectElement;
@@ -267,25 +255,25 @@ $(document).ready(function () {
             handleDoNotInsert(systemUploadAnyAttach)
         );
     };
+    const handleModuleStepsCalls = (module, step) => {
+        // mostafa continue here
+        // mostafa -> here we need to make the function generic based on the next step type, also don't forget to change the keys that the stored in session storage
 
-    // const handleCreatingSelectStep = async (Li, module, step) => {
-    //     const stepKey = `step${step}`;
-    //     const selectHandler = async () => {
-    //         const systemUploadAnyAttach = await handleMessageInsertion(
-    //             module.moduleSteps[stepKey].message,
-    //             "incoming"
-    //         );
-    //         await handleButtonInsertion(systemUploadAnyAttach, "Yes", () =>
-    //             handleYesInsert(systemUploadAnyAttach, module)
-    //         );
-    //         await handleButtonInsertion(systemUploadAnyAttach, "No", () =>
-    //             handleDoNotInsert(systemUploadAnyAttach)
-    //         );
-    //     };
-    //     // next step
-    //     await handleInsertingSelect(module, step, Li);
-    // };
-
+        const stepKey = `step${step + 1}`;
+        const type = module.moduleSteps[stepKey].type;
+        switch (type) {
+            case "date":
+                break;
+            case "value":
+                break;
+            case "options":
+                break;
+            case "attachments":
+                handleInsertingAttachmentStep(module, step);
+                break;
+            default:
+        }
+    };
     const handleUserNumberOfDaysInsertion = async (date, module, step) => {
         await handleMessageInsertion(date, "outgoing");
         let stepKey = `step${step}`;
