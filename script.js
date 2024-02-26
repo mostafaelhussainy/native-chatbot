@@ -8,24 +8,21 @@ $(document).ready(function () {
     let userMessage = null;
     const chatInput = $(".chat-input textarea");
     const inputInitialHeight = chatInput.scrollHeight;
-
-    const leaveRequestSteps = {
-        moduleName: "leaveTypeRequest",
+    const leaveRequestModule = {
+        moduleKey: "leaveRequestModule",
         moduleLabel: "Apply for leave",
-        moduleSteps: [
-            {
-                message: "Pick your date",
-                type: "date",
-                name: "starting date",
+        moduleSteps: {
+            step1: {
+                message: "Pick your starting date",
                 key: "startingDate",
             },
-            {
+            step2: {
                 message: "Please enter your number of days",
                 type: "value",
                 name: "number of days",
                 key: "numberOfDays",
             },
-            {
+            step3: {
                 message: "Please choose your leave type",
                 type: "options",
                 name: "leave type",
@@ -36,13 +33,13 @@ $(document).ready(function () {
                     { value: "Type 3", text: "Type 3" },
                 ],
             },
-            {
+            step4: {
                 message: "Do you want to upload any attachments?",
                 type: "attachments",
                 name: "attachment name",
                 key: "attachmentName",
             },
-        ],
+        },
     };
     const disabledButtonsWithinParent = (parentElement) => {
         parentElement.find("button").prop("disabled", true);
@@ -119,8 +116,14 @@ $(document).ready(function () {
         positionElement,
         inputLabel,
         inputId,
-        dateInsertionHandler
+        dateInsertionHandler,
+        module,
+        step
     ) => {
+        const moduleKey = module.moduleKey;
+        const key = module.moduleSteps.step1.key;
+        const message = module.moduleSteps.step1.message;
+
         const input = $("<input>").addClass("datepicker").attr("id", inputId);
         const label = $("<label>").attr("for", inputId);
         const button = $("<button>");
@@ -142,17 +145,12 @@ $(document).ready(function () {
                 const year = dateObject.getFullYear();
                 const formattedDate = `${month}/${day}/${year}`;
 
-                saveRequestInSessionStorage(
-                    "userLeaveTypeRequest",
-                    "startingDate",
-                    "starting date",
-                    formattedDate
-                );
+                saveRequestInSessionStorage(moduleKey, key, message, formattedDate);
 
                 button.prop("disabled", true);
 
                 $(this).datepicker("destroy");
-                dateInsertionHandler(formattedDate);
+                dateInsertionHandler(formattedDate, module, step + 1);
             });
         return typeWriterAnimationHandler(label, inputLabel, 50);
     };
@@ -171,7 +169,7 @@ $(document).ready(function () {
         await handleMessageInsertion(leaveSummaryMessage, "incoming");
     };
 
-    const handleInsertAttachment = async (parentMsg) => {
+    const handleYesInsert = async (parentMsg) => {
         await handleMessageInsertion("Yes", "outgoing");
 
         $("#send-attachments input").click();
@@ -194,25 +192,36 @@ $(document).ready(function () {
                     binaryString,
                     true
                 );
-                await showRequestSummary("userLeaveTypeRequest"); // to be removed
+                await showRequestSummary("userLeaveTypeRequest"); // next step
             };
             reader.readAsBinaryString(file);
             disabledButtonsWithinParent(parentMsg);
         });
     };
 
-    const handleNotInsertingAttachment = async (parentMsg) => {
+    const handleDoNotInsert = async (parentMsg) => {
         await handleMessageInsertion("No", "outgoing");
         disabledButtonsWithinParent(parentMsg);
-        showRequestSummary("userLeaveTypeRequest"); // to be removed
+        showRequestSummary("userLeaveTypeRequest"); // next step
     };
 
-    const handleInsertingSelect = async (
-        defaultOptionText = "Select one option",
-        optionsList,
-        nextStepFunction,
-        chatWrapper
-    ) => {
+    const handleInsertingSelect = async (module, step, chatWrapper) => {
+        // step3: {
+        //     message: "Please choose your leave type",
+        //     type: "options",
+        //     name: "leave type",
+        //     key: "leaveType",
+        //     options: [
+        //         { value: "Type 1", text: "Type 1" },
+        //         { value: "Type 2", text: "Type 2" },
+        //         { value: "Type 3", text: "Type 3" },
+        //     ],
+        // },
+
+        const stepKey = `step${step}`;
+        const defaultOptionText = "Select one option";
+        const optionsList = module.moduleSteps[stepKey].options || "Select one option";
+
         var selectElement = $("<select>");
         var defaultOption = $("<option>")
             .attr("value", "")
@@ -236,40 +245,55 @@ $(document).ready(function () {
                 "leave type",
                 params.selected
             );
-            await nextStepFunction(); // to be removed
+
+            const nextStepKey = `step${step + 1}`;
+            if (!module.moduleSteps[stepKey]) return;
+            // mostafa -> here we need to make the function generic based on the next step type, also don't forget to change the keys that the stored in session storage
+            await nextStepFunction(); // next step
         });
 
         return selectElement;
     };
 
-    const handleCreationLeaveTypeSelect = async (Li) => {
-        var options = [
-            { value: "Type 1", text: "Type 1" },
-            { value: "Type 2", text: "Type 2" },
-            { value: "Type 3", text: "Type 3" },
-        ];
-        const selectHandler = async () => {
-            const systemUploadAnyAttach = await handleMessageInsertion(
-                "Do you want to upload any attachments?",
-                "incoming"
-            );
-            await handleButtonInsertion(systemUploadAnyAttach, "Yes", () =>
-                handleInsertAttachment(systemUploadAnyAttach)
-            );
-            await handleButtonInsertion(systemUploadAnyAttach, "No", () =>
-                handleNotInsertingAttachment(systemUploadAnyAttach)
-            );
-        };
-        await handleInsertingSelect("Select Type", options, selectHandler, Li);
+    const handleInsertingAttachmentStep = async (module, step) => {
+        const systemUploadAnyAttach = await handleMessageInsertion(
+            "Do you want to insert any attachments?",
+            "incoming"
+        );
+        await handleButtonInsertion(systemUploadAnyAttach, "Yes", () =>
+            handleYesInsert(systemUploadAnyAttach)
+        );
+        await handleButtonInsertion(systemUploadAnyAttach, "No", () =>
+            handleDoNotInsert(systemUploadAnyAttach)
+        );
     };
 
-    const handleUserDateSelection = async (date) => {
+    // const handleCreatingSelectStep = async (Li, module, step) => {
+    //     const stepKey = `step${step}`;
+    //     const selectHandler = async () => {
+    //         const systemUploadAnyAttach = await handleMessageInsertion(
+    //             module.moduleSteps[stepKey].message,
+    //             "incoming"
+    //         );
+    //         await handleButtonInsertion(systemUploadAnyAttach, "Yes", () =>
+    //             handleYesInsert(systemUploadAnyAttach, module)
+    //         );
+    //         await handleButtonInsertion(systemUploadAnyAttach, "No", () =>
+    //             handleDoNotInsert(systemUploadAnyAttach)
+    //         );
+    //     };
+    //     // next step
+    //     await handleInsertingSelect(module, step, Li);
+    // };
+
+    const handleUserNumberOfDaysInsertion = async (date, module, step) => {
         await handleMessageInsertion(date, "outgoing");
-        await handleMessageInsertion("Please enter your number of days", "incoming");
+        let stepKey = `step${step}`;
+        await handleMessageInsertion(module.moduleSteps[stepKey].message, "incoming"); // next step
 
         $(chatInput).prop("disabled", false);
         $(".chat-input i").css("display", "block");
-        $(chatInput).prop("placeholder", "Enter number of leave days");
+        $(chatInput).prop("placeholder", "Enter number of days");
         $(chatInput).focus();
         const handleChatInsertion = async () => {
             userMessage = chatInput.val().trim();
@@ -285,20 +309,22 @@ $(document).ready(function () {
             $(".chat-input i").css("display", "none");
 
             saveRequestInSessionStorage(
-                "userLeaveTypeRequest",
-                "numberOfDays",
-                "number of days",
+                module.moduleKey,
+                module.moduleSteps[stepKey].key,
+                module.moduleSteps[stepKey].name,
                 userMessage
             );
 
             handleMessageInsertion(userMessage, "outgoing");
-            // next step call start
+
+            stepKey = `step${step + 1}`;
+            if (!module.moduleSteps[stepKey]) return;
             const botMsg = await handleMessageInsertion(
-                "Please choose your leave type",
+                module.moduleSteps[stepKey].message,
                 "incoming"
             );
-            await handleCreationLeaveTypeSelect(botMsg);
-            // next step call end
+
+            await handleInsertingSelect(module, step + 1, botMsg);
         };
         chatInput.on("keydown", (e) => {
             if (e.key === "Enter" && !e.shiftKey && window.innerWidth > 800) {
@@ -313,91 +339,33 @@ $(document).ready(function () {
 
     const handleApplyForLeave = async () => {
         const applyForLeaveBody = {};
-        sessionStorage.setItem("userLeaveTypeRequest", JSON.stringify(applyForLeaveBody));
-        handleMessageInsertion("Apply for leave", "outgoing");
+        sessionStorage.setItem(leaveRequestModule.moduleKey, JSON.stringify(applyForLeaveBody));
+        handleMessageInsertion(leaveRequestModule.moduleLabel, "outgoing");
 
         const systemMsg = await handleMessageInsertion("", "incoming");
+        // step 1
         await handleDatePickerInsertion(
             systemMsg,
-            "Pick your date",
+            leaveRequestModule.moduleSteps.step1.message,
             "testId",
-            handleUserDateSelection
+            handleUserNumberOfDaysInsertion, // pass in the date from handleDatePickerInsertion itself by calling it and pass in (date and module)
+            leaveRequestModule,
+            1
         );
     };
 
-    const handleStartingModule = (module) => {
-        const { moduleName, moduleLabel, moduleSteps } = module;
-        sessionStorage.setItem(moduleName, JSON.stringify({}));
-        handleMessageInsertion(moduleLabel, "outgoing");
-        debugger;
-        // mostafa
-        // moduleSteps: [
-        //     {
-        //         message: "Pick your date",
-        //         type: "date",
-        //         name: "starting date",
-        //         key: "startingDate",
-        //     },
-        //     {
-        //         message: "Please enter your number of days",
-        //         type: "value",
-        //         name: "number of days",
-        //         key: "numberOfDays",
-        //     },
-        //     {
-        //         message: "Please choose your leave type",
-        //         type: "options",
-        //         name: "leave type",
-        //         key: "leaveType",
-        //         options: [
-        //             { value: "Type 1", text: "Type 1" },
-        //             { value: "Type 2", text: "Type 2" },
-        //             { value: "Type 3", text: "Type 3" },
-        //         ],
-        //     },
-        //     {
-        //         message: "Do you want to upload any attachments?",
-        //         type: "attachments",
-        //         name: "attachment name",
-        //         key: "attachmentName",
-        //     },
-        // ],
-
-        moduleSteps.forEach(async (step) => {
-            let userResponse; // to store the user choice after each step and show it in a message
-            switch (step.type) {
-                case "date":
-                    const systemMsg = await handleMessageInsertion("", "incoming");
-                    handleDatePickerInsertion(
-                        systemMsg,
-                        step.message,
-                        "testId",
-                        handleUserDateSelection
-                    );
-                    break;
-                case "value":
-                    break;
-                case "options":
-                    break;
-                case "attachments":
-                    break;
-                // default:
-            }
-        });
-    };
     const handleChatBotToggler = async () => {
         chatBotWrapper.toggleClass("show-chatbot");
         if (!chatBotWrapper.hasClass("loaded")) {
             chatBotWrapper.addClass("loaded");
             const firstChatMessageContainer = $(".chat-box > .chat.incoming");
             await typeWriterAnimationHandler(firstChatMessageContainer, startingMsg, 50);
-            // await handleButtonInsertion(
-            //     firstChatMessageContainer,
-            //     "Apply for leave",
-            //     handleApplyForLeave
-            // );
-            await handleButtonInsertion(firstChatMessageContainer, "Apply for leave", () =>
-                handleStartingModule(leaveRequestSteps)
+
+            // apply for leave module
+            await handleButtonInsertion(
+                firstChatMessageContainer,
+                leaveRequestModule.moduleLabel,
+                handleApplyForLeave
             );
         }
     };
