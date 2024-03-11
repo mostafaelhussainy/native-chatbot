@@ -12,23 +12,29 @@
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-        <div id="chatbot-wrapper">
-            <button class="chatbot-toggler">
+        <div id="chatbot">
+            <button class="chatbot-toggle-btn">
                 <i class="fa-solid fa-comments"></i>
                 <i class="fa-solid fa-xmark"></i>
             </button>
-
-            <div class="chatbot">
+            <div class="chatbot-inner-window">
                 <header>
-                    <h2>ESS Chatbot</h2>
+                    <img src="./companyLogo.png" alt="company logo" />
+                    <span>
+                        <h2>ESS Chatbot</h2>
+                        <h4>Hi 7amo! <img src="./waving-hand-emoji.png" /></h4>
+                    </span>
                 </header>
-                <ul class="chat-box">
-                    <li class="chat incoming"></li>
-                </ul>
-                <div class="chat-input">
+                <div class="chatbot-status">
+                    <span class="online">We are online!</span>
+                </div>
+                <ul class="messages-list"></ul>
+                <div class="new-message">
                     <textarea spellcheck="false" disabled required></textarea>
-                    <i id="send-btn" class="fa-solid fa-paper-plane"></i>
-                    <label id="send-attachments">
+                    <button class="send-message-btn">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                    <label id="attachments-label">
                         <input type="file" />
                     </label>
                 </div>
