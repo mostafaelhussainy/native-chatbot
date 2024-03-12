@@ -59,6 +59,12 @@ body {
     display: inline;
 }
 
+.opened .chatbot-inner-window {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
 .chatbot-inner-window {
     position: fixed;
     right: 35px;
@@ -87,79 +93,6 @@ body {
     display: none;
 }
 
-/* .chatbot-inner-window button:not(:disabled) label {
-    cursor: pointer;
-}
-.chatbot-inner-window button {
-    align-items: center;
-    appearance: none;
-    background-color: #add8e6;
-    border-radius: 24px;
-    border-style: none;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 3px 5px -1px, rgba(0, 0, 0, 0.14) 0 6px 10px 0,
-        rgba(0, 0, 0, 0.12) 0 1px 18px 0;
-    box-sizing: border-box;
-    color: #f7f7f7;
-    cursor: pointer;
-    display: inline-flex;
-    fill: currentcolor;
-    font-family: "Google Sans", Roboto, Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    height: 40px;
-    justify-content: center;
-    letter-spacing: 0.25px;
-    line-height: normal;
-    max-width: 100%;
-    overflow: visible;
-    padding: 0 4px;
-    position: relative;
-    text-align: center;
-    text-transform: none;
-    transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1), opacity 15ms linear 30ms,
-        transform 270ms cubic-bezier(0, 0, 0.2, 1) 0ms;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-    width: auto;
-    will-change: transform, opacity;
-    z-index: 0;
-    min-width: 80px;
-}
-
-.chatbot-inner-window button:disabled {
-    background-color: #75858a;
-    cursor: auto;
-}
-.chatbot-inner-window button:not(:disabled) {
-    box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0, rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
-}
-
-.chatbot-inner-window button:not(:disabled):hover {
-    box-shadow: rgba(60, 64, 67, 0.3) 0 2px 3px 0, rgba(60, 64, 67, 0.15) 0 6px 10px 4px;
-}
-
-.chatbot-inner-window button:not(:disabled) {
-    box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0, rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
-}
-.chatbot-inner-window button:not(:disabled):active {
-    box-shadow: rgba(60, 64, 67, 0.3) 0 4px 4px 0, rgba(60, 64, 67, 0.15) 0 8px 12px 6px;
-}
-
-.chatbot-inner-window button:not(:disabled):focus {
-    box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0, rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
-}
-.chatbot-inner-window button:focus {
-    outline: none;
-    border: 2px solid #4285f4;
-} */
-
-.opened .chatbot-inner-window {
-    opacity: 1;
-    pointer-events: auto;
-    transform: scale(1);
-}
-
 .chatbot-inner-window header {
     padding: 16px 0;
     position: relative;
@@ -172,6 +105,48 @@ body {
     align-items: center;
     padding-left: 40px;
 }
+.chatbot-inner-window header .width-toggler-btn {
+    background: none;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border-radius: 50%;
+    outline: none;
+}
+
+.chatbot-inner-window header .width-toggler-btn:hover::before {
+    transform: scale(1);
+    z-index: 5;
+}
+
+.chatbot-inner-window header .width-toggler-btn::before {
+    content: "";
+    position: absolute;
+    background: rgba(0, 36, 92, 0.16);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    z-index: -1;
+    transition: all 0.16s ease-in-out 0s;
+    transform: scale(0);
+    top: calc(50% - 20px);
+    left: calc(50% - 20px);
+}
+
+.chatbot-inner-window header .width-toggler-btn img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.chatbot-inner-window header .width-toggler-btn.minimized .minimize-icon,
+.chatbot-inner-window header .width-toggler-btn.maximized .maximize-icon {
+    display: none;
+}
+
 .chatbot-inner-window .chatbot-status .online {
     display: block;
     position: relative;
@@ -285,23 +260,24 @@ header h2 {
     color: #fff;
     white-space: pre-wrap;
     font-size: 14px;
-    width: 75%;
+    width: 70%;
 }
 
-.messages-list .incoming {
+.messages-list .chat.incoming {
     border-radius: 10px 10px 10px 0;
     color: #000;
     background: #f2f2f2;
     position: relative;
-    margin-left: 30px;
+    margin-left: 35px;
+    width: 90%;
 }
 
 .messages-list .incoming:before {
-    content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="m10.5 15.5c0 .37-.1.7-.28 1-.34-.59-.98-1-1.72-1s-1.38.41-1.72 1c-.17-.3-.28-.63-.28-1 0-1.1.9-2 2-2s2 .9 2 2m12.5-.5v3c0 .55-.45 1-1 1h-1v1c0 1.11-.89 2-2 2h-14c-1.1 0-2-.89-2-2v-1h-1c-.55 0-1-.45-1-1v-3c0-.55.45-1 1-1h1c0-3.87 3.13-7 7-7h1v-1.27c-.6-.34-1-.99-1-1.73 0-1.1.9-2 2-2s2 .9 2 2c0 .74-.4 1.39-1 1.73v1.27h1c3.87 0 7 3.13 7 7h1c.55 0 1 .45 1 1m-2 1h-2v-2c0-2.76-2.24-5-5-5h-4c-2.76 0-5 2.24-5 5v2h-2v1h2v3h14v-3h2zm-5.5-2.5c-1.1 0-2 .9-2 2 0 .37.11.7.28 1 .34-.59.98-1 1.72-1s1.38.41 1.72 1c.18-.3.28-.63.28-1 0-1.1-.89-2-2-2z"/></svg>');
-    width: 20px;
-    height: 20px;
+    content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" height="32" viewBox="0 0 32 32" width="32"><path d="m5 3.5c0 .65311-.4174 1.20873-1 1.41465v7.08535l2.16075 5.4867-2.16075 5.5133c-1.1 0-2-.8992-2-1.9982v-7.0036c0-.7357.40334-1.3819 1-1.7287v-7.35485c-.5826-.20592-1-.76154-1-1.41465 0-.82843.67157-1.5 1.5-1.5s1.5.67157 1.5 1.5z" fill="%23f8312f"/><path d="m30.0499 3.55c0 .68107-.4392 1.25955-1.0499 1.46757v7.18223c.5967.3471 1 .9939 1 1.7303v7.01c0 1.1-.9 2-2 2l-2.9405-5.6792 2.9405-5.3308v-6.9125c-.6107-.20799-1.05-.78649-1.05-1.4676 0-.85604.6939-1.55 1.55-1.55.856 0 1.5499.69396 1.5499 1.55z" fill="%23f8312f"/><path d="m11 4.5c0-.82843.6716-1.5 1.5-1.5h7c.8284 0 1.5.67157 1.5 1.5 0 .67932-.4516 1.25317-1.0709 1.43774-.2765.08238-.5696.10387-.8462.18581l-3.053.90437-3.1191-.90828c-.2725-.07936-.5607-.10013-.8331-.1799-.6228-.18238-1.0777-.75794-1.0777-1.43974z" fill="%23ffb02e"/><path d="m22.05 30h-12.1c-3.29 0-5.95-2.66-5.95-5.95v-12.02c0-3.33 2.7-6.03 6.03-6.03h11.95c3.32 0 6.02 2.7 6.02 6.03v12.03c0 3.28-2.66 5.94-5.95 5.94z" fill="%23cdc4d6"/><path d="m9.24738 18.5h13.50522c2.3296 0 4.2474-1.919 4.2474-4.25 0-2.341-1.9078-4.25-4.2474-4.25h-13.50522c-2.33958 0-4.24738 1.909-4.24738 4.25s1.9078 4.25 4.24738 4.25z" fill="%23212121"/><path d="m13.4718 26h5.0564c.811 0 1.4718-.6735 1.4718-1.5s-.6608-1.5-1.4718-1.5h-5.0564c-.811 0-1.4718.6735-1.4718 1.5s.6608 1.5 1.4718 1.5z" fill="%23212121"/><g fill="%2300a6ed"><path d="m10.25 12c-.69036 0-1.25.5596-1.25 1.25v2.5c0 .6904.55964 1.25 1.25 1.25.6904 0 1.25-.5596 1.25-1.25v-2.5c0-.6904-.5596-1.25-1.25-1.25z"/><path d="m21.75 12c-.6904 0-1.25.5596-1.25 1.25v2.5c0 .6904.5596 1.25 1.25 1.25s1.25-.5596 1.25-1.25v-2.5c0-.6904-.5596-1.25-1.25-1.25z"/></g></svg>');
+    width: 32px;
+    height: 32px;
     position: absolute;
-    left: -30px;
+    left: -40px;
     bottom: 5px;
 }
 
@@ -335,10 +311,31 @@ header h2 {
     color: #007dfc;
     outline: none;
     word-break: break-word;
+    position: relative;
 }
 
-.messages-list .incoming .message-options button:disabled {
+.messages-list .incoming .message-options button:not(:disabled):hover::before {
+    transform: scale(1);
+    z-index: 5;
+}
+
+.messages-list .incoming .message-options button::before {
+    content: "";
+    position: absolute;
+    background: #6193c54f;
+    z-index: -1;
+    transition: all 0.16s ease-in-out 0s;
+    transform: scale(0);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.messages-list .incoming .message-options button:disabled,
+.messages-list .incoming .message-options button:disabled label {
     color: #ccc;
+    cursor: initial;
 }
 
 .messages-list .incoming .message-options button:last-of-type {
@@ -384,6 +381,28 @@ header h2 {
     border: none;
     margin-bottom: 18px;
 }
+
+.messages-list .incoming .module-edit-form .module-edit-form__submit-btn {
+    border: 1px solid #253544;
+    color: #253544;
+    padding: 2px 14px;
+    line-height: 34px;
+    text-align: center;
+    font-size: 14px;
+    border-radius: 24px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-left: auto;
+    width: max(10%, 67px);
+    text-align: center;
+    display: block;
+}
+.messages-list .incoming .module-edit-form .module-edit-form__submit-btn:disabled {
+    color: #ccc;
+    border-color: #ccc;
+    cursor: initial;
+}
+
 .chatbot-inner-window .new-message {
     display: flex;
     align-items: center;

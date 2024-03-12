@@ -11,7 +11,10 @@ $(document).ready(function () {
     const AST_VALUE = "Payroll supervisor";
     const NO_VALUES_MESSAGE = "Sorry, there're no values to select from";
     const SUBMIT_REQUEST_MESSAGE = "Do you want to submit your request?";
+    const widthBtnToggler = $(".width-toggler-btn");
+    const chatBotWindow = $(".chatbot-inner-window");
     const leaveRequestModule = {
+        moduleName: "leave request",
         moduleKey: "leaveRequestModule",
         moduleLabel: "Apply for leave",
         moduleSteps: {
@@ -115,6 +118,21 @@ $(document).ready(function () {
         parentElement.find("button").prop("disabled", true);
     };
 
+    const disableBtnsFieldsChosen = (parentElement) => {
+        parentElement.find("button").prop("disabled", true).css("color", "#ccc");
+        parentElement.find("label").css("color", "#ccc");
+        parentElement.find("input").prop("disabled", true).css("color", "#ccc");
+        parentElement
+            .find("select")
+            .prop("disabled", true)
+            .trigger("chosen:updated")
+            .css("color", "#ccc");
+        parentElement
+            .find(".datepicker")
+            .datepicker("option", "disabled", true)
+            .css("color", "#ccc");
+    };
+
     const saveRequestInSessionStorage = (
         requestNameInSessionStorage,
         propertyObjectName,
@@ -171,15 +189,16 @@ $(document).ready(function () {
         });
     };
 
-    const handleButtonInsertion = async (positionElement, btnText, btnClickHandler) => {
+    const handleButtonInsertion = async (positionElement, btnText, btnClickHandler, active) => {
         const button = $("<button>").addClass("list-btn");
         positionElement.append(button);
         if (typeof btnClickHandler === "function") {
             const clickHandler = async function () {
                 await btnClickHandler();
-                button.prop("disabled", true);
                 // Remove the click event handler after it's been executed
+                if (active) return;
                 button.off("click", clickHandler);
+                button.prop("disabled", true);
             };
             button.on("click", clickHandler);
         }
@@ -240,36 +259,9 @@ $(document).ready(function () {
 
     const handleSubmitTheRequest = () => {};
 
-    const getRequestFromSessionStorage = (requestNameInSessionStorage) => {
+    const getRequestDataFromSessionStorage = (requestNameInSessionStorage) => {
         return JSON.parse(sessionStorage.getItem(requestNameInSessionStorage));
     };
-
-    // step2: {
-    //     defaultOption: "Select one option",
-    //     message: "Do you need advanced payment?",
-    //     type: "options",
-    //     name: "advanced payment",
-    //     key: "advancedPayment",
-    //     stepNum: 2,
-    //     options: [
-    //         { value: "Yes", text: "Yes" },
-    //         { value: "No", text: "No" },
-    //     ],
-    // },
-    // step3: {
-    //     type: "date",
-    //     message: "Pick your starting date",
-    //     key: "startingDate",
-    //     stepNum: 3,
-    // },
-    // step4: {
-    //     message: "Please enter your number of days",
-    //     placeHolder: "Enter your number of days",
-    //     type: "value",
-    //     name: "number of days",
-    //     key: "numberOfDays",
-    //     stepNum: 4,
-    // },
 
     const handleEditOptionStepValue = async (form, value, module, step) => {
         const stepKey = `step${step}`;
@@ -288,87 +280,100 @@ $(document).ready(function () {
         form.append(label);
 
         $(selectElement).chosen();
-        // $(selectElement).on("change", async (evt, params) => {
-        //     saveRequestInSessionStorage(
-        //         module.moduleKey,
-        //         module.moduleSteps[stepKey].key,
-        //         module.moduleSteps[stepKey].name,
-        //         params.selected,
-        //         step
-        //     );
-        // });
-
-        return selectElement;
+        $(selectElement).on("change", async (evt, params) => {
+            saveRequestInSessionStorage(
+                module.moduleKey,
+                module.moduleSteps[stepKey].key,
+                module.moduleSteps[stepKey].name,
+                params.selected,
+                step
+            );
+        });
     };
+
     const handleEditDateStepValue = async (form, value, module, step) => {
-        debugger;
         const stepKey = `step${step}`;
+        const moduleKey = module.moduleKey;
+        const key = module.moduleSteps[stepKey].key;
+        const message = module.moduleSteps[stepKey].message;
+
         const input = $("<input>").addClass("datepicker");
         const label = $("<label>").text(`${module.moduleSteps[stepKey].name}:`);
 
         label.append(input);
         form.append(label);
 
-        const datePicker = $(".datepicker");
-
-        // Initialize the datepicker
         input.datepicker({
             autoclose: true,
         });
 
-        const [day, month, year] = value.split("/").map(Number); // Parse the selected value into day, month, and year components
-        const selectedDate = new Date(year, month - 1, day); // Create a new Date object using these components
-        // datePicker.datepicker("setDate", selectedDate); // Set the selected date in the date picker
         input.val(value);
-        // const changeDateHandler = async function (e) {
-        //     const selectedDate = e.date;
-        //     const dateObject = new Date(selectedDate);
-        //     const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
-        //     const day = dateObject.getDate().toString().padStart(2, "0");
-        //     const year = dateObject.getFullYear();
-        //     const formattedDate = `${month}/${day}/${year}`;
-        //     // saveRequestInSessionStorage(moduleKey, key, message, formattedDate, step);
-        // };
 
-        // // Add event listener for changeDate event
-        // datePicker.on("changeDate", changeDateHandler);
+        const changeDateHandler = async function (e) {
+            const selectedDate = e.date;
+            const dateObject = new Date(selectedDate);
+            const month = (dateObject.getMonth() + 1).toString().padStart(2, "0");
+            const day = dateObject.getDate().toString().padStart(2, "0");
+            const year = dateObject.getFullYear();
+            const formattedDate = `${month}/${day}/${year}`;
+            saveRequestInSessionStorage(moduleKey, key, message, formattedDate, step);
+        };
+
+        // Add event listener for changeDate event
+        input.on("changeDate", changeDateHandler);
     };
+
     const handleEditValueStepValue = async (form, value, module, step) => {
-        const input = $("<input>").addClass("datepicker").val(value);
-        const label = $("<label>").text("file name");
-
-        label.append(input);
-        form.append(label);
-
-        // input.on("change", function(e) {
-        //     saveRequestInSessionStorage(
-        //         module.moduleKey,
-        //         module.moduleSteps[stepKey].key,
-        //         module.moduleSteps[stepKey].name,
-        //         e.target.value,
-        //         step
-        //     );
-        // });
-    };
-    const handleEditAttachmentStepValue = async (form, value, module, step) => {
-        debugger;
         const stepKey = `step${step}`;
-        const input = $("<input>").attr("type", "hidden").val(value.binaryString);
+        const input = $("<input>").addClass("datepicker").val(value);
         const label = $("<label>").text(`${module.moduleSteps[stepKey].name}:`);
 
         label.append(input);
         form.append(label);
 
-        // input.on("change", function() {
-        //     saveRequestInSessionStorage(
-        //         module.moduleKey,
-        //         module.moduleSteps[stepKey].key,
-        //         module.moduleSteps[stepKey].name,
-        //         userMessage,
-        //         step
-        //     );
-        // });
+        input.on("change", function (e) {
+            saveRequestInSessionStorage(
+                module.moduleKey,
+                module.moduleSteps[stepKey].key,
+                module.moduleSteps[stepKey].name,
+                e.target.value,
+                step
+            );
+        });
     };
+
+    const handleEditAttachmentStepValue = async (form, value, module, step) => {
+        const stepKey = `step${step}`;
+
+        const blob = new Blob([value.binary], { type: "application/octet-stream" });
+        const file = new File([blob], value.fileName);
+        const input = $("<input>").attr("type", "file");
+        const label = $("<label>").text(`${module.moduleSteps[stepKey].name}:`);
+        label.append(input);
+        form.append(label);
+
+        const fileList = new DataTransfer();
+        fileList.items.add(file);
+
+        input[0].files = fileList.files;
+
+        $(input).change(function () {
+            var file = $(this)[0].files[0];
+            var reader = new FileReader();
+            reader.onload = async (event) => {
+                var binaryString = event.target.result;
+                saveRequestInSessionStorage(
+                    module.moduleKey,
+                    "attachment",
+                    "attachment",
+                    { fileName: file.name, binary: binaryString },
+                    step
+                );
+            };
+            reader.readAsBinaryString(file);
+        });
+    };
+
     const handleEditFetchedOptionStepValue = async (form, value, module, step) => {
         const stepKey = `step${step}`;
         const label = $("<label>").text(`${module.moduleSteps[stepKey].name}:`);
@@ -378,19 +383,29 @@ $(document).ready(function () {
         label.append(selectElement);
         form.append(label);
         $(selectElement).chosen();
+        $(selectElement).on("change", async (evt, params) => {
+            saveRequestInSessionStorage(
+                module.moduleKey,
+                module.moduleSteps[stepKey].key,
+                module.moduleSteps[stepKey].name,
+                params.selected,
+                step
+            );
+        });
     };
-    const handleFormInsertion = async (message, module) => {
-        const form = $("<form>").addClass("module-edit-form");
-        const moduleKey = module.moduleKey;
-        const req = getRequestFromSessionStorage(moduleKey);
 
-        for (const key in req) {
-            if (req.hasOwnProperty(key)) {
-                const step = req[key].step;
-                const value = req[key].value;
+    const handleFormInsertion = async (message, module) => {
+        const form = $("<form>").addClass("module-edit-form").attr("novalidate", "");
+        const moduleKey = module.moduleKey;
+        const requestData = getRequestDataFromSessionStorage(moduleKey);
+        message.append(form);
+
+        for (const key in requestData) {
+            if (requestData.hasOwnProperty(key)) {
+                const step = requestData[key].step;
+                const value = requestData[key].value;
                 const stepKey = `step${step}`;
                 const type = module.moduleSteps[stepKey]?.type || null;
-
                 switch (type) {
                     case "date":
                         await handleEditDateStepValue(form, value, module, step);
@@ -415,9 +430,17 @@ $(document).ready(function () {
 
         const submitBtn = $("<button>")
             .addClass("module-edit-form__submit-btn")
-            .attr("type", "submit");
-        form.append(submitBtn);
-        message.append(form);
+            .attr("type", "submit")
+            .text("Save");
+        const div = $("<div>");
+        div.append(submitBtn).css("width", "100%");
+        form.append(div);
+
+        form.on("submit", (event) => {
+            event.preventDefault();
+            showRequestSummary(module.moduleKey, module);
+            disableBtnsFieldsChosen(form);
+        });
     };
 
     const handleEditTheRequest = async (module) => {
@@ -430,7 +453,7 @@ $(document).ready(function () {
 
     const showRequestSummary = async (requestItemName, module) => {
         const summary = JSON.parse(sessionStorage.getItem(requestItemName));
-        let leaveSummaryMessage = "Your leave request summary:\n";
+        let leaveSummaryMessage = `Your ${module.moduleName} summary:\n`;
         for (const key in summary) {
             if (summary.hasOwnProperty(key)) {
                 if (typeof summary[key].value !== "object") {
@@ -464,13 +487,14 @@ $(document).ready(function () {
     };
 
     const handleYesInsert = async (parentMsg, module, step) => {
-        await handleMessageInsertion("Yes", "outgoing");
-
         $("#attachments-label input").click();
         $("#attachments-label input").change(function () {
             var file = $(this)[0].files[0];
             var reader = new FileReader();
             reader.onload = async (event) => {
+                debugger;
+                parentMsg.find("button").prop("disabled", true);
+                await handleMessageInsertion("Yes", "outgoing");
                 var binaryString = event.target.result;
                 await handleMessageInsertion(`You've uploaded: ${file.name}`, "incoming");
                 const moduleKey = module.moduleKey;
@@ -478,16 +502,16 @@ $(document).ready(function () {
                 const key = module.moduleSteps[stepKey].key;
                 saveRequestInSessionStorage(
                     moduleKey,
-                    "attachmentFileName",
-                    "attachment name",
+                    "attachment",
+                    "attachment",
                     { fileName: file.name, binary: binaryString },
                     step
                 );
 
                 await handleModuleStepsCalls(module, step + 1);
+                disabledButtonsWithinParent(parentMsg);
             };
             reader.readAsBinaryString(file);
-            disabledButtonsWithinParent(parentMsg);
         });
     };
 
@@ -546,8 +570,13 @@ $(document).ready(function () {
 
         const optionsDiv = await HandleOptionsDivInsertion(systemUploadAnyAttach);
 
-        await handleButtonInsertion(optionsDiv, "Yes", () =>
-            handleYesInsert(optionsDiv, module, step)
+        await handleButtonInsertion(
+            optionsDiv,
+            "Yes",
+            () => {
+                handleYesInsert(optionsDiv, module, step);
+            },
+            true
         );
         await handleButtonInsertion(optionsDiv, "No", () =>
             handleDoNotInsert(optionsDiv, module, step)
@@ -708,4 +737,14 @@ $(document).ready(function () {
     closeBtn.on("click", () => chatBotWrapper.removeClass("opened"));
 
     chatbotToggler.on("click", handleChatBotToggler);
+
+    $(widthBtnToggler).on("click", () => {
+        $(widthBtnToggler).toggleClass("minimized").toggleClass("maximized");
+        if ($(widthBtnToggler).hasClass("minimized")) {
+            $(chatBotWindow).css("width", "420px");
+        } else {
+            $(chatBotWindow).css("width", "800px");
+        }
+        $(widthBtnToggler).toggleClass("rotated");
+    });
 });
