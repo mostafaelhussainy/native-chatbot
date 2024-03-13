@@ -106,6 +106,7 @@ $(document).ready(function () {
         },
     };
 
+    // done
     const HandleOptionsDivInsertion = async (parentMessage) => {
         const optionsDiv = $("<div>").addClass("message-options");
         parentMessage.css("padding-bottom", "0");
@@ -114,10 +115,12 @@ $(document).ready(function () {
         return optionsDiv;
     };
 
+    // done
     const disabledButtonsWithinParent = (parentElement) => {
         parentElement.find("button").prop("disabled", true);
     };
 
+    // done
     const disableBtnsFieldsChosen = (parentElement) => {
         parentElement.find("button").prop("disabled", true).css("color", "#ccc");
         parentElement.find("label").css("color", "#ccc");
@@ -133,6 +136,7 @@ $(document).ready(function () {
             .css("color", "#ccc");
     };
 
+    // done
     const saveRequestInSessionStorage = (
         requestNameInSessionStorage,
         propertyObjectName,
@@ -150,6 +154,7 @@ $(document).ready(function () {
         sessionStorage.setItem(requestNameInSessionStorage, JSON.stringify(request));
     };
 
+    // done
     const typeWriterAnimationHandler = (targetElement, textContent, speed) => {
         let charIndex = 0;
         return new Promise((resolve, reject) => {
@@ -157,7 +162,7 @@ $(document).ready(function () {
                 if (charIndex < textContent.length) {
                     targetElement.text(targetElement.text() + textContent.charAt(charIndex));
                     charIndex++;
-                    setTimeout(type, speed);
+                    setTimeout(type, 200);
                 } else {
                     chatBox.scrollTop(chatBox.prop("scrollHeight"));
                     resolve();
@@ -167,6 +172,7 @@ $(document).ready(function () {
         });
     };
 
+    // done
     const handleMessageInsertion = async (message, className) => {
         const chatLi = $("<li>").addClass("chat").addClass(className);
         let chatContent = `${message}`;
@@ -189,6 +195,7 @@ $(document).ready(function () {
         });
     };
 
+    // done
     const handleButtonInsertion = async (positionElement, btnText, btnClickHandler, active) => {
         const button = $("<button>").addClass("list-btn");
         positionElement.append(button);
@@ -206,6 +213,7 @@ $(document).ready(function () {
         return button;
     };
 
+    // done
     const handleDatePickerInsertion = async (module, step) => {
         const stepKey = `step${step}`;
         const moduleKey = module.moduleKey;
@@ -257,12 +265,15 @@ $(document).ready(function () {
         await typeWriterAnimationHandler(label, "From here!", 13);
     };
 
+    // done
     const handleSubmitTheRequest = () => {};
 
+    // done
     const getRequestDataFromSessionStorage = (requestNameInSessionStorage) => {
         return JSON.parse(sessionStorage.getItem(requestNameInSessionStorage));
     };
 
+    // done
     const handleEditOptionStepValue = async (form, value, module, step) => {
         const stepKey = `step${step}`;
         const optionsList = module.moduleSteps[stepKey].options;
@@ -583,6 +594,7 @@ $(document).ready(function () {
         );
     };
 
+    // done
     const handleModuleStepsCalls = async (module, step) => {
         const stepKey = `step${step}`;
         const type = module.moduleSteps[stepKey]?.type || null;
@@ -609,6 +621,7 @@ $(document).ready(function () {
         }
     };
 
+    // done
     const handleFetchOptions = async (module, step) => {
         const stepKey = `step${step}`;
         if (true) {
@@ -657,6 +670,7 @@ $(document).ready(function () {
         }
     };
 
+    // done
     const handleValueInsertion = async (module, step) => {
         let stepKey = `step${step}`;
         await handleMessageInsertion(module.moduleSteps[stepKey].message, "incoming"); // next step
@@ -743,7 +757,8 @@ $(document).ready(function () {
         if ($(widthBtnToggler).hasClass("minimized")) {
             $(chatBotWindow).css("width", "420px");
         } else {
-            $(chatBotWindow).css("width", "800px");
+            const minWidth = Math.min(800, $(window).width() - 70);
+            $(chatBotWindow).css("width", minWidth + "px");
         }
         $(widthBtnToggler).toggleClass("rotated");
     });
