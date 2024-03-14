@@ -1,53 +1,56 @@
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <title>Chatbot</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
-        <link rel="stylesheet" href="./bootstrap.min.css" />
-        <link rel="stylesheet" href="./bootstrap-datepicker.min.css" />
-        <link rel="stylesheet" href="./chosen.min.css" />
-        <link rel="stylesheet" href="style.css" />
-    </head>
-    <body>
-        <div id="chatbot">
-            <button class="chatbot-toggle-btn">
-                <i class="fa-solid fa-comments"></i>
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="chatbot-inner-window">
-                <header>
-                    <img src="./companyLogo.png" alt="company logo" />
-                    <span>
-                        <h2>ESS Chatbot</h2>
-                        <h4>Hi 7amo! <img src="./waving-hand-emoji.png" /></h4>
-                    </span>
-                    <button class="width-toggler-btn minimized">
-                        <img class="maximize-icon" src="maximize-icon.svg" />
-                        <img class="minimize-icon" src="minimize-icon.svg" />
-                    </button>
-                </header>
-                <div class="chatbot-status">
-                    <span class="online">We are online!</span>
-                </div>
-                <ul class="messages-list"></ul>
-                <div class="new-message">
-                    <textarea spellcheck="false" disabled required></textarea>
-                    <button class="send-message-btn">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </button>
-                    <label id="attachments-label">
-                        <input type="file" />
-                    </label>
-                </div>
-            </div>
+  <head>
+    <meta charset="utf-8" />
+    <title>Chatbot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="./bootstrap.min.css" />
+    <link rel="stylesheet" href="./bootstrap-datepicker.min.css" />
+    <link rel="stylesheet" href="./chosen.min.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="chatbot">
+      <button class="chatbot-toggle-btn">
+        <i class="fa-solid fa-comments"></i>
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="chatbot-inner-window">
+        <header>
+          <img src="./companyLogo.png" alt="company logo" />
+          <span>
+            <h2>ESS Chatbot</h2>
+            <h4>Hi 7amo! <img src="./waving-hand-emoji.png" /></h4>
+          </span>
+          <button class="width-toggler-btn minimized">
+            <img class="maximize-icon" src="maximize-icon.svg" />
+            <img class="minimize-icon" src="minimize-icon.svg" />
+          </button>
+        </header>
+        <div class="chatbot-status">
+          <span class="online">We are online!</span>
         </div>
-        <script src="./jquery.min.js"></script>
-        <script src="./bootstrap-datepicker.min.js"></script>
-        <script src="./bootstrap.min.js"></script>
-        <script src="./chosen.jquery.min.js"></script>
-        <script src="./script.js"></script>
-    </body>
+        <ul class="messages-list"></ul>
+        <div class="new-message">
+          <textarea spellcheck="false" disabled required></textarea>
+          <button class="send-message-btn">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+          <label id="attachments-label">
+            <input type="file" />
+          </label>
+        </div>
+      </div>
+    </div>
+    <script src="./jquery.min.js"></script>
+    <script src="./bootstrap-datepicker.min.js"></script>
+    <script src="./bootstrap.min.js"></script>
+    <script src="./chosen.jquery.min.js"></script>
+    <!-- <script src="./script.js"></script> -->
+
+    <script src="./refactored-script.js"></script>
+  </body>
 </html>

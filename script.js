@@ -486,6 +486,7 @@ $(document).ready(function () {
     await handleFormInsertion(botMsg, module);
   };
 
+  // done
   const showRequestSummary = async (requestItemName, module) => {
     const summary = JSON.parse(sessionStorage.getItem(requestItemName));
     let leaveSummaryMessage = `Your ${module.moduleName} summary:\n`;
@@ -525,6 +526,7 @@ $(document).ready(function () {
     );
   };
 
+  // done
   const handleYesInsert = async (parentMsg, module, step) => {
     $("#attachments-label input").click();
     $("#attachments-label input").change(function () {
@@ -557,12 +559,14 @@ $(document).ready(function () {
     });
   };
 
+  // done
   const handleDoNotInsert = async (parentMsg, module, step) => {
     await handleMessageInsertion("No", "outgoing");
     disabledButtonsWithinParent(parentMsg);
     await handleModuleStepsCalls(module, step + 1);
   };
 
+  // done
   const handleInsertingSelect = async (module, step) => {
     const stepKey = `step${step}`;
     const botMsg = await handleMessageInsertion(
@@ -606,6 +610,7 @@ $(document).ready(function () {
     return selectElement;
   };
 
+  // done
   const handleInsertingAttachmentStep = async (module, step) => {
     const systemUploadAnyAttach = await handleMessageInsertion(
       module.moduleSteps[`step${step}`].message,
@@ -751,6 +756,7 @@ $(document).ready(function () {
     sendChatBtn.on("click", handleChatInsertion);
   };
 
+  // done
   const handleApplyForLeave = async () => {
     const applyForLeaveBody = {};
     sessionStorage.setItem(
@@ -761,6 +767,7 @@ $(document).ready(function () {
     handleModuleStepsCalls(leaveRequestModule, 1);
   };
 
+  // done
   const handleStartingMainMenu = async () => {
     const message = await handleMessageInsertion(
       STARTING_MESSAGE,
@@ -775,7 +782,9 @@ $(document).ready(function () {
     );
   };
 
+  // done
   const handleChatBotToggler = async () => {
+    debugger;
     chatBotWrapper.toggleClass("opened");
     if (!chatBotWrapper.hasClass("loaded")) {
       chatBotWrapper.addClass("loaded");
@@ -783,17 +792,22 @@ $(document).ready(function () {
     }
   };
 
+  // done
   chatInput.on("input", () => {
     chatInput.css("height", "auto");
     chatInput.css("height", `${chatInput.scrollHeight}px`);
   });
 
+  // done
   chatbotToggler.on("click", () => $("body").toggleClass("opened"));
 
+  // done
   closeBtn.on("click", () => chatBotWrapper.removeClass("opened"));
 
+  // done
   chatbotToggler.on("click", handleChatBotToggler);
 
+  // done function not event listener
   $(widthBtnToggler).on("click", () => {
     $(widthBtnToggler).toggleClass("minimized").toggleClass("maximized");
     if ($(widthBtnToggler).hasClass("minimized")) {
