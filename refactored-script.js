@@ -22,11 +22,12 @@ const constants = {
     SUBMIT: "Yes, submit!",
     EDIT: "Wait, I want to edit!",
     BACK_TO_MENU: "No, go back to main menu!",
+    EDIT_MESSAGE: "Feel free to edit any fields from below and save to proceed",
     NO_OPTIONS_FETCHED: "N/A",
     YES: "Yes",
     NO: "No",
     CHAT_INPUT_INITIAL_HEIGHT: elements.chatInput.scrollHeight,
-    TYPING_SPEED: 30,
+    TYPING_SPEED: 0,
 };
 
 // Define leave request modules
@@ -115,11 +116,7 @@ const requestModules = {
                 key: "deputizeValue",
                 stepNum: 8,
                 link: 7,
-                options: [
-                    { value: "All locations", text: "All locations" },
-                    { value: "Same location", text: "Same location" },
-                    { value: "My manager", text: "My manager" },
-                ],
+                options: [],
             },
         },
     },
@@ -172,6 +169,7 @@ const utils = {
         reqName,
         propObjName,
         propName,
+        propType,
         propVal,
         step,
         notIncludedInSummary = false
@@ -179,6 +177,7 @@ const utils = {
         const req = JSON.parse(sessionStorage.getItem(reqName));
         req[propObjName] = {};
         req[propObjName].name = propName;
+        req[propObjName].type = propType;
         req[propObjName].value = propVal;
         req[propObjName].step = step;
         req[propObjName].notIncludedInSummary = notIncludedInSummary;
@@ -186,6 +185,28 @@ const utils = {
     },
     getReqFromSessionStorage: (reqName) => {
         return JSON.parse(sessionStorage.getItem(reqName));
+    },
+    handleChangingAttachmentValue: (module, step, targetElement, isEdit) => {
+        const FILE = $(targetElement)[0].files[0];
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            const BINARY_STRING = event.target.result;
+            const moduleKey = module.moduleKey;
+            utils.savePropToSessionStorage(
+                moduleKey,
+                "attachment",
+                "attachment",
+                "attachments",
+                { fileName: FILE.name, binary: BINARY_STRING },
+                step
+            );
+
+            if (!isEdit) {
+                await messageHandler.insertMessage(`You've uploaded: ${FILE.name}`, "incoming");
+                await moduleRequest.moduleStepper(module, step + 1);
+            }
+        };
+        reader.readAsBinaryString(FILE);
     },
 };
 
@@ -224,16 +245,16 @@ const messageHandler = {
         return btn;
     },
 
-    insertDatePicker: async (module, step, positionElement, isEdit) => {
+    insertDatePicker: async (module, step, positionElement, isEdit, value) => {
         const STEP_KEY = `step${step}`;
         const { moduleKey, moduleSteps } = module;
-        const { key, message } = moduleSteps[STEP_KEY];
+        const { key, message, type } = moduleSteps[STEP_KEY];
         const { savePropToSessionStorage, disableDatePicker, disableElement, animateTyping } =
             utils;
 
-        const input = $("<input>").addClass("datepicker").attr("id", key);
-        const label = $("<label>").attr("for", key);
-        const button = $("<button>").append(label);
+        const INPUT = $("<input>").addClass("datepicker");
+        const LABEL = $("<label>");
+        const BUTTON = $("<button>");
 
         let botMessage, optionsDiv;
 
@@ -244,9 +265,18 @@ const messageHandler = {
             );
             $(botMessage).css("row-gap", "10px");
             optionsDiv = await messageHandler.insertOptionsDiv(botMessage);
-            optionsDiv.append(button).append(input);
+
+            INPUT.attr("id", key);
+            LABEL.attr("for", key);
+            optionsDiv.append(BUTTON);
+            BUTTON.append(LABEL);
+            BUTTON.append(INPUT);
         } else {
-            positionElement.append(button).append(input);
+            LABEL.text(`${module.moduleSteps[STEP_KEY].name}:`);
+            const FORM = positionElement.find("form");
+            FORM.append(LABEL);
+            LABEL.append(INPUT);
+            INPUT.val(value);
         }
 
         const datePicker = $(".datepicker").datepicker({
@@ -262,19 +292,19 @@ const messageHandler = {
             const YEAR = DATE_OBJECT.getFullYear();
             const FORMATTED_DATE = `${MONTH}/${DAY}/${YEAR}`;
 
-            savePropToSessionStorage(moduleKey, key, message, FORMATTED_DATE, step);
+            savePropToSessionStorage(moduleKey, key, message, type, FORMATTED_DATE, step);
 
             if (isEdit) return;
-            disableElement(button);
+            disableElement(BUTTON);
             disableDatePicker(datePicker, changeDateHandler);
             await messageHandler.insertMessage(FORMATTED_DATE, "outgoing");
-            await moduleRequest.nextStep(module, step + 1);
+            await moduleRequest.moduleStepper(module, step + 1);
         };
 
         datePicker.on("changeDate", changeDateHandler);
 
         if (isEdit) return;
-        await animateTyping(label, "From here!");
+        await animateTyping(LABEL, "From here!");
     },
 
     insertOptionsDiv: async (positionElement) => {
@@ -285,9 +315,10 @@ const messageHandler = {
         return div;
     },
 
-    insertValue: async (module, step, isEdit) => {
+    insertValue: async (module, step, positionElement, isEdit, value) => {
+        debugger;
         const STEP_KEY = `step${step}`;
-        const { message, placeHolder, key, name } = module.moduleSteps[STEP_KEY];
+        const { message, placeHolder, key, name, type } = module.moduleSteps[STEP_KEY];
         const { activeChatInput, resetChatInput, savePropToSessionStorage } = utils;
         const { sendMessageIcon, sendChatBtn, chatInput } = elements;
         if (!isEdit) {
@@ -297,9 +328,9 @@ const messageHandler = {
                 const userMessage = chatInput.val().trim();
                 if (!userMessage) return;
                 resetChatInput();
-                savePropToSessionStorage(module.moduleKey, key, name, userMessage, step);
+                savePropToSessionStorage(module.moduleKey, key, name, type, userMessage, step);
                 await messageHandler.insertMessage(userMessage, "outgoing");
-                await moduleRequest.nextStep(module, step + 1);
+                await moduleRequest.moduleStepper(module, step + 1);
             };
 
             chatInput.on("keydown", (e) => {
@@ -312,33 +343,91 @@ const messageHandler = {
             sendMessageIcon.on("click", handleChatInput);
             sendChatBtn.on("click", handleChatInput);
         } else {
-            // edit
+            const VALUE_INPUT = $("<input>").attr("type", "text"); // Create a new input element
+            const INPUT_LABEL = $("<label>").text(name).append(VALUE_INPUT); // Append the input to the label
+            const FORM = positionElement.find("form");
+            FORM.append(INPUT_LABEL);
+            VALUE_INPUT.val(value);
+
+            VALUE_INPUT.on("change", function (e) {
+                savePropToSessionStorage(module.moduleKey, key, name, type, e.target.value, step);
+            });
         }
     },
 
-    insertAttachment: async (module, step, positionElement, isEdit) => {
-        elements.attachmentInput.click();
-        elements.attachmentInput.change(function () {
-            const file = $(this)[0].files[0];
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                const binaryString = event.target.result;
-                const moduleKey = module.moduleKey;
-                utils.savePropToSessionStorage(
-                    moduleKey,
-                    "attachment",
-                    "attachment",
-                    { fileName: file.name, binary: binaryString },
-                    step
-                );
+    insertAttachmentOption: async (module, step) => {
+        const { YES, NO } = constants;
+        const { insertMessage, insertOptionsDiv, insertAttachment } = messageHandler;
+        const STEP_KEY = `step${step}`;
+        const { message } = module.moduleSteps[STEP_KEY];
 
-                if (!isEdit) {
-                    await messageHandler.insertMessage(`You've uploaded: ${file.name}`, "incoming");
-                    await moduleRequest.nextStep(module, step + 1);
-                }
-            };
-            reader.readAsBinaryString(file);
-        });
+        const BOT_MESSAGE = await insertMessage(message, "incoming");
+        const OPTIONS_DIV = await insertOptionsDiv(BOT_MESSAGE);
+
+        BOT_MESSAGE.append(OPTIONS_DIV);
+
+        const yesOptionHandler = async () => {
+            insertAttachment(module, step);
+
+            const OPTIONS_BUTTONS = $(OPTIONS_DIV).find("button");
+            OPTIONS_BUTTONS.each(function () {
+                utils.disableElement($(this));
+            });
+        };
+
+        const noOptionHandler = async () => {
+            await insertMessage(constants.NO, "outgoing");
+
+            const OPTIONS_BUTTONS = $(OPTIONS_DIV).find("button");
+            OPTIONS_BUTTONS.each(function () {
+                utils.disableElement($(this));
+            });
+
+            utils.savePropToSessionStorage(
+                module.moduleKey,
+                "attachment",
+                "attachment",
+                "attachments",
+                {},
+                step
+            );
+            await moduleRequest.moduleStepper(module, step + 1);
+        };
+
+        await messageHandler.insertButton(OPTIONS_DIV, YES, yesOptionHandler);
+        await messageHandler.insertButton(OPTIONS_DIV, NO, noOptionHandler);
+    },
+
+    insertAttachment: async (module, step, positionElement, isEdit, value) => {
+        if (isEdit) {
+            const STEP_KEY = `step${step}`;
+
+            const BLOB = new Blob([value.binary], { type: "application/octet-stream" });
+            const FILE = new File([BLOB], value.fileName);
+            const INPUT = $("<input>").attr("type", "file");
+            const LABEL = $("<label>")
+                .text(`${module.moduleSteps[STEP_KEY].name}:`)
+                .css("width", "100%");
+            LABEL.append(INPUT);
+
+            const FORM = positionElement.find("form");
+            FORM.append(LABEL);
+
+            const FILES_LIST = new DataTransfer();
+            FILES_LIST.items.add(FILE);
+            if (value.fileName && value.binary) {
+                INPUT[0].files = FILES_LIST.files;
+            }
+
+            INPUT.change((event) =>
+                utils.handleChangingAttachmentValue(module, step, event.target, isEdit)
+            );
+        } else {
+            elements.attachmentInput.click();
+            elements.attachmentInput.change((event) =>
+                utils.handleChangingAttachmentValue(module, step, event.target, isEdit)
+            );
+        }
     },
 
     insertFetchedOptions: async (module, step, positionElement, isEdit) => {
@@ -347,13 +436,20 @@ const messageHandler = {
             await messageHandler.insertMessage(NO_VALUES_MESSAGE, "incoming");
             const STEP_KEY = `step${step}`;
             const { key, name } = module.moduleSteps[STEP_KEY];
-            utils.savePropToSessionStorage(module.moduleKey, key, name, NO_OPTIONS_FETCHED, step);
-            await moduleRequest.nextStep(module, step + 1);
+            utils.savePropToSessionStorage(
+                module.moduleKey,
+                key,
+                name,
+                "fetchedOptions",
+                NO_OPTIONS_FETCHED,
+                step
+            );
+            await moduleRequest.moduleStepper(module, step + 1);
         } else {
         }
     },
 
-    insertChosenSelect: async (module, step, positionElement, isEdit) => {
+    insertChosenSelect: async (module, step, positionElement, isEdit, value) => {
         const { insertMessage } = messageHandler;
         const STEP_KEY = `step${step}`;
         let botMessage;
@@ -361,12 +457,12 @@ const messageHandler = {
             botMessage = await insertMessage(module.moduleSteps[STEP_KEY].message, "incoming");
             $(botMessage).css("row-gap", "10px");
         }
-        const DEFAULT_OPTION_TEXT = module.moduleSteps[STEP_KEY].defaultOption;
         const OPTIONS_LIST = module.moduleSteps[STEP_KEY].options;
 
         const SELECT_ELEMENT = $("<select>");
 
         if (!isEdit) {
+            const DEFAULT_OPTION_TEXT = module.moduleSteps[STEP_KEY].defaultOption;
             const DEFAULT_OPTION = $("<option>")
                 .attr("value", "")
                 .text(DEFAULT_OPTION_TEXT)
@@ -377,23 +473,33 @@ const messageHandler = {
 
         OPTIONS_LIST.forEach((option) => {
             const OPTION_ELEMENT = $("<option>").attr("value", option.value).text(option.text);
+            if (isEdit && option.text === value) {
+                OPTION_ELEMENT.prop("selected", true);
+            }
             SELECT_ELEMENT.append(OPTION_ELEMENT);
         });
-        if (!isEdit) {
-            botMessage.append(SELECT_ELEMENT);
+        if (OPTIONS_LIST.length == 0) {
+            const OPTION_ELEMENT = $("<option>").attr("value", "N/A").text("N/A");
+            SELECT_ELEMENT.append(OPTION_ELEMENT);
+        }
+        if (isEdit) {
+            const SELECT_LABEL = $("<label>").text(`${module.moduleSteps[STEP_KEY].name}:`);
+            const FORM = positionElement.find("form");
+            SELECT_LABEL.append(SELECT_ELEMENT);
+            FORM.append(SELECT_LABEL);
         } else {
-            // edit
+            botMessage.append(SELECT_ELEMENT);
         }
         $(SELECT_ELEMENT).chosen();
         $(SELECT_ELEMENT).on("change", async (evt, params) => {
             const { moduleKey, moduleSteps } = module;
             const { key, name } = moduleSteps[STEP_KEY];
 
-            utils.savePropToSessionStorage(moduleKey, key, name, params.selected, step);
+            utils.savePropToSessionStorage(moduleKey, key, name, "options", params.selected, step);
             if (isEdit) return;
             $(SELECT_ELEMENT).prop("disabled", true).trigger("chosen:updated");
             insertMessage(params.selected, "outgoing");
-            await moduleRequest.nextStep(module, step + 1);
+            await moduleRequest.moduleStepper(module, step + 1);
         });
 
         return SELECT_ELEMENT;
@@ -401,7 +507,7 @@ const messageHandler = {
 
     insertSummary: async (requestItemName, module) => {
         const { start, submit, edit } = moduleRequest;
-        const { insertMessage, insertOptionsDiv, insertButton, insertYesOrNo } = messageHandler;
+        const { insertMessage, insertOptionsDiv, insertButton } = messageHandler;
         const { getReqFromSessionStorage, disableElement } = utils;
         const { SUBMIT, EDIT, BACK_TO_MENU, SUBMIT_REQUEST_MESSAGE } = constants;
         const SUMMARY = getReqFromSessionStorage(requestItemName);
@@ -437,15 +543,6 @@ const messageHandler = {
             start();
         });
     },
-
-    insertYesOrNo: async (message, yesHandler, noHandler) => {
-        const { insertMessage, insertOptionsDiv, insertButton } = utils;
-        const BOT_MESSAGE = await insertMessage(message, "incoming");
-        const OPTIONS_DIV = await insertOptionsDiv(BOT_MESSAGE);
-        const { YES, NO } = constants;
-        await insertButton(OPTIONS_DIV, YES, yesHandler);
-        await insertButton(OPTIONS_DIV, NO, noHandler);
-    },
 };
 
 // Define module functions
@@ -464,20 +561,22 @@ const moduleRequest = {
             }
         }
     },
+
     applyForModule: async (module) => {
         const MODULE_OBJECT = {};
         sessionStorage.setItem(module.moduleKey, JSON.stringify(MODULE_OBJECT));
         // problem here
         await messageHandler.insertMessage(module.moduleLabel, "outgoing");
-        await moduleRequest.nextStep(module, 1);
+        await moduleRequest.moduleStepper(module, 1);
     },
-    nextStep: async (module, step) => {
+
+    moduleStepper: async (module, step) => {
         const stepKey = `step${step}`;
         const { type } = module.moduleSteps[stepKey] || {};
         const {
             insertDatePicker,
             insertChosenSelect,
-            insertAttachment,
+            insertAttachmentOption,
             insertValue,
             insertSummary,
             insertFetchedOptions,
@@ -494,7 +593,7 @@ const moduleRequest = {
                 await insertChosenSelect(module, step);
                 break;
             case "attachments":
-                await insertAttachment(module, step);
+                await insertAttachmentOption(module, step);
                 break;
             case "fetchedOptions":
                 await insertFetchedOptions(module, step);
@@ -504,9 +603,76 @@ const moduleRequest = {
                 break; // Return early for the "summary" case
         }
     },
-    edit: () => {
-        console.log("edit");
+
+    moduleStepperEditMode: async (module, step, value, type, editMessage) => {
+        const {
+            insertDatePicker,
+            insertChosenSelect,
+            insertAttachment,
+            insertValue,
+            insertSummary,
+            insertFetchedOptions,
+        } = messageHandler;
+        switch (type) {
+            case "date":
+                debugger;
+                await insertDatePicker(module, step, editMessage, true, value);
+                break;
+            case "value":
+                debugger;
+                await insertValue(module, step, editMessage, true, value);
+                break;
+            case "options":
+                await insertChosenSelect(module, step, editMessage, true, value);
+                break;
+            case "attachments":
+                await insertAttachment(module, step, editMessage, true, value);
+                break;
+            case "fetchedOptions":
+                // await insertFetchedOptions(module, step, editMessage, true, value);
+                await insertChosenSelect(module, step, editMessage, true, value);
+                break;
+            default:
+                await insertSummary(module, step);
+                break; // Return early for the "summary" case
+        }
     },
+
+    edit: async (module) => {
+        const FORM = $("<form>").addClass("module-edit-form");
+        const MODULE_KEY = module.moduleKey;
+        const REQUEST_DATA = utils.getReqFromSessionStorage(MODULE_KEY);
+        const EDIT_MESSAGE = await messageHandler.insertMessage(constants.EDIT_MESSAGE, "incoming");
+        EDIT_MESSAGE.append(FORM);
+
+        for (const KEY in REQUEST_DATA) {
+            console.log("REQUEST_DATA", REQUEST_DATA);
+            if (REQUEST_DATA.hasOwnProperty(KEY)) {
+                const { value, type, step } = REQUEST_DATA[KEY];
+                await moduleRequest.moduleStepperEditMode(module, step, value, type, EDIT_MESSAGE);
+            }
+        }
+
+        const SUBMIT_BTN = $("<button>")
+            .addClass("module-edit-form__submit-btn")
+            .attr("type", "submit")
+            .text("Save");
+
+        const DIV = $("<div>");
+        DIV.append(SUBMIT_BTN).css("width", "100%");
+        DIV.append(SUBMIT_BTN);
+        FORM.append(DIV);
+
+        FORM.on("submit", (event) => {
+            event.preventDefault();
+            messageHandler.insertSummary(MODULE_KEY, module);
+            const $elements = $("select, input, button");
+            $elements.each(function () {
+                utils.disableElement($(this));
+            });
+        });
+    },
+
     submit: () => {
         console.log("submit");
     },
@@ -532,6 +698,7 @@ const interactionHandler = {
             moduleRequest.start();
         }
     },
+
     handleWidthBtnToggler: () => {
         const { widthBtnToggler, chatBotWindow } = elements;
         $(widthBtnToggler).toggleClass("minimized").toggleClass("maximized");
