@@ -18,15 +18,28 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div class="chatbot-inner-window">
+                <div class="restart-confirmation-message">
+                    Are you sure you want to restart this conversation?
+                    <div class="restart-confirmation-message__row">
+                        <button class="restart-confirmation-message__yes overlay-btn without-icon">
+                            Yes</button
+                        ><button class="restart-confirmation-message__no overlay-btn without-icon">
+                            No
+                        </button>
+                    </div>
+                </div>
                 <header>
                     <img src="./companyLogo.png" alt="company logo" />
                     <span>
                         <h2>ESS Chatbot</h2>
                         <h4>Hi 7amo! <img src="./waving-hand-emoji.png" /></h4>
                     </span>
-                    <button class="width-toggler-btn minimized">
+                    <button class="width-toggler-btn minimized overlay-btn">
                         <img class="maximize-icon" src="maximize-icon.svg" />
                         <img class="minimize-icon" src="minimize-icon.svg" />
+                    </button>
+                    <button class="restart-btn overlay-btn">
+                        <img src="restart-icon.svg" />
                     </button>
                 </header>
                 <div class="chatbot-status">

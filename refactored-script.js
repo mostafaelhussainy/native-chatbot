@@ -1,15 +1,22 @@
 // Define constants for DOM elements
 const elements = {
-    chatbotToggler: $(".chatbot-toggle-btn"),
-    closeBtn: $(".close-btn"),
-    chatBox: $(".messages-list"),
-    sendChatBtn: $(".send-message-btn"),
+    chatbotToggler: $("#chatbot .chatbot-toggle-btn"),
+    closeBtn: $("#chatbot .close-btn"),
+    sendChatBtn: $("#chatbot .send-message-btn"),
     chatBotWrapper: $("#chatbot"),
-    chatInput: $(".new-message textarea"),
-    widthBtnToggler: $(".width-toggler-btn"),
-    chatBotWindow: $(".chatbot-inner-window"),
-    sendMessageIcon: $(".new-message i"),
-    attachmentInput: $("#attachments-label input"),
+    chatInput: $("#chatbot .new-message textarea"),
+    widthBtnToggler: $("#chatbot .width-toggler-btn"),
+    chatBotWindow: $("#chatbot .chatbot-inner-window"),
+    sendMessageIcon: $("#chatbot .new-message i"),
+    attachmentInput: $("#chatbot #attachments-label input"),
+    restartBtn: $("#chatbot .restart-btn"),
+    header: $("#chatbot header"),
+    chatBotStatus: $("#chatbot .chatbot-status"),
+    chatBox: $("#chatbot .messages-list"),
+    chatBotInputArea: $("#chatbot .new-message"),
+    restartConfirmationMessage: $("#chatbot .restart-confirmation-message"),
+    restartConfirmationMessageYesBtn: $(".restart-confirmation-message__yes"),
+    restartConfirmationMessageNoBtn: $(".restart-confirmation-message__no"),
 };
 
 // Define constants for messages and configurations
@@ -30,7 +37,108 @@ const constants = {
     TYPING_SPEED: 0,
 };
 
-// Define leave request modules
+// // Define leave request modules
+// const requestModules = {
+//     leaveRequestModule: {
+//         moduleName: "leave request",
+//         moduleKey: "leaveRequestModule",
+//         moduleLabel: "Apply for leave",
+//         moduleSteps: {
+//             step1: {
+//                 defaultOption: "Select one option",
+//                 message: "Are you going abroad?",
+//                 type: "dropDown",
+//                 name: "going abroad",
+//                 key: "goingAbroad",
+//                 stepNum: 1,
+//                 options: [
+//                     { value: "Yes", text: "Yes" },
+//                     { value: "No", text: "No" },
+//                 ],
+//             },
+//             step2: {
+//                 defaultOption: "Select one option",
+//                 message: "Do you need advanced payment?",
+//                 type: "dropDown",
+//                 name: "advanced payment",
+//                 key: "advancedPayment",
+//                 stepNum: 2,
+//                 options: [
+//                     { value: "Yes", text: "Yes" },
+//                     { value: "No", text: "No" },
+//                 ],
+//             },
+//             step3: {
+//                 type: "date",
+//                 name: "starting date",
+//                 message: "Pick your starting date",
+//                 key: "startingDate",
+//                 stepNum: 3,
+//             },
+//             step4: {
+//                 message: "Please enter your number of days",
+//                 placeHolder: "Enter your number of days",
+//                 type: "value",
+//                 name: "number of days",
+//                 key: "numberOfDays",
+//                 stepNum: 4,
+//             },
+//             step5: {
+//                 defaultOption: "Select one option",
+//                 message: "Please choose your leave type",
+//                 type: "dropDown",
+//                 name: "leave type",
+//                 key: "leaveType",
+//                 stepNum: 5,
+//                 options: [
+//                     { value: "Type 1", text: "Type 1" },
+//                     { value: "Type 2", text: "Type 2" },
+//                     { value: "Type 3", text: "Type 3" },
+//                 ],
+//             },
+//             step6: {
+//                 message: "Do you want to upload any attachments?",
+//                 type: "attachments",
+//                 name: "attachment name",
+//                 key: "attachmentName",
+//                 stepNum: 6,
+//             },
+//             step7: {
+//                 message: `Since you're ${constants.AST_VALUE} please deputize your approvals?`,
+//                 type: "optionsWithSubOptions",
+//                 name: "deputize type",
+//                 key: "deputizeType",
+//                 stepNum: 7,
+//                 options: [
+//                     {
+//                         value: "All locations",
+//                         text: "All locations",
+//                         subList: [
+//                             { value: "option 1", text: "option 1" },
+//                             { value: "option 2", text: "option 2" },
+//                             { value: "option 3", text: "option 3" },
+//                         ],
+//                     },
+//                     {
+//                         value: "Same location",
+//                         text: "Same location",
+//                         subList: [
+//                             { value: "option 4", text: "option 4" },
+//                             { value: "option 5", text: "option 5" },
+//                             { value: "option 6", text: "option 6" },
+//                         ],
+//                     },
+//                     {
+//                         value: "My manager",
+//                         text: "My manager",
+//                         subList: [],
+//                     },
+//                 ],
+//                 subMessage: "Select your deputize",
+//             },
+//         },
+//     },
+// };
 const requestModules = {
     leaveRequestModule: {
         moduleName: "leave request",
@@ -40,7 +148,7 @@ const requestModules = {
             step1: {
                 defaultOption: "Select one option",
                 message: "Are you going abroad?",
-                type: "options",
+                type: "dropDown",
                 name: "going abroad",
                 key: "goingAbroad",
                 stepNum: 1,
@@ -52,7 +160,7 @@ const requestModules = {
             step2: {
                 defaultOption: "Select one option",
                 message: "Do you need advanced payment?",
-                type: "options",
+                type: "dropDown",
                 name: "advanced payment",
                 key: "advancedPayment",
                 stepNum: 2,
@@ -79,7 +187,7 @@ const requestModules = {
             step5: {
                 defaultOption: "Select one option",
                 message: "Please choose your leave type",
-                type: "options",
+                type: "dropDown",
                 name: "leave type",
                 key: "leaveType",
                 stepNum: 5,
@@ -98,7 +206,7 @@ const requestModules = {
             },
             step7: {
                 message: `Since you're ${constants.AST_VALUE} please deputize your approvals?`,
-                type: "options",
+                type: "dropDown",
                 name: "deputize type",
                 key: "deputizeType",
                 stepNum: 7,
@@ -109,27 +217,28 @@ const requestModules = {
                     { value: "My manager", text: "My manager" },
                 ],
             },
-            step8: {
-                message: "Select your deputize",
-                type: "fetchedOptions",
-                name: "deputize value",
-                key: "deputizeValue",
-                stepNum: 8,
-                link: 7,
-                options: [],
-            },
         },
     },
 };
-
 // Define utility functions
 const utils = {
     scrollToBottom: () => elements.chatBox.scrollTop(elements.chatBox.prop("scrollHeight")),
+
     disableElement: (element) => element.prop("disabled", true).css("color", "#ccc"),
+
     disableDatePicker: (datePicker, callback) => {
         datePicker.datepicker("destroy");
         datePicker.off("changeDate", callback);
     },
+
+    blurElements: (...elements) => {
+        elements.forEach((element) => $(element).css("filter", "blur(5px)"));
+    },
+
+    removeBlur: (...elements) => {
+        elements.forEach((element) => $(element).css("filter", "blur(0)"));
+    },
+
     activeChatInput: (placeHolder) => {
         const { chatInput, sendMessageIcon } = elements;
         chatInput.prop("disabled", false);
@@ -137,6 +246,7 @@ const utils = {
         chatInput.prop("placeholder", placeHolder);
         chatInput.focus();
     },
+
     resetChatInput: () => {
         const { chatInput, chatBox, sendChatBtn, sendMessageIcon } = elements;
         chatInput.val("");
@@ -149,6 +259,7 @@ const utils = {
         sendChatBtn.off("click");
         sendMessageIcon.css("display", "none");
     },
+
     animateTyping: async (targetElement, textContent) => {
         let charIndex = 0;
         return new Promise((resolve, reject) => {
@@ -165,6 +276,7 @@ const utils = {
             type();
         });
     },
+
     savePropToSessionStorage: (
         reqName,
         propObjName,
@@ -183,9 +295,11 @@ const utils = {
         req[propObjName].notIncludedInSummary = notIncludedInSummary;
         sessionStorage.setItem(reqName, JSON.stringify(req));
     },
+
     getReqFromSessionStorage: (reqName) => {
         return JSON.parse(sessionStorage.getItem(reqName));
     },
+
     handleChangingAttachmentValue: (module, step, targetElement, isEdit) => {
         const FILE = $(targetElement)[0].files[0];
         const reader = new FileReader();
@@ -313,6 +427,69 @@ const messageHandler = {
         positionElement.css("border-radius", "0 10px 10px 0");
         positionElement.append(div);
         return div;
+    },
+
+    insertOptions: async (module, step, positionElement, isEdit, value) => {
+        const { insertMessage, insertOptionsDiv, insertButton } = messageHandler;
+        const { options, message } = module.moduleSteps[STEP_KEY];
+        const MESSAGE = await insertMessage(message, "incoming with-options");
+        const OPTIONS_DIV = await insertOptionsDiv(MESSAGE);
+
+        options.forEach(async (option) => {
+            await insertButton(OPTIONS_DIV, option.text, () => {
+                const val = option.value;
+                utils.savePropToSessionStorage(moduleKey, key, name, "dropDown", val, step);
+            });
+        });
+
+        // const { insertMessage } = messageHandler;
+        // const STEP_KEY = `step${step}`;
+        // let botMessage;
+        // if (!isEdit) {
+        //     botMessage = await insertMessage(module.moduleSteps[STEP_KEY].message, "incoming");
+        //     $(botMessage).css("row-gap", "10px");
+        // }
+        // const OPTIONS_LIST = module.moduleSteps[STEP_KEY].options;
+        // const SELECT_ELEMENT = $("<select>");
+        // if (!isEdit) {
+        //     const DEFAULT_OPTION_TEXT = module.moduleSteps[STEP_KEY].defaultOption;
+        //     const DEFAULT_OPTION = $("<option>")
+        //         .attr("value", "")
+        //         .text(DEFAULT_OPTION_TEXT)
+        //         .prop("disabled", true)
+        //         .prop("selected", true);
+        //     SELECT_ELEMENT.append(DEFAULT_OPTION);
+        // }
+        // OPTIONS_LIST.forEach((option) => {
+        //     const OPTION_ELEMENT = $("<option>").attr("value", option.value).text(option.text);
+        //     if (isEdit && option.text === value) {
+        //         OPTION_ELEMENT.prop("selected", true);
+        //     }
+        //     SELECT_ELEMENT.append(OPTION_ELEMENT);
+        // });
+        // if (OPTIONS_LIST.length == 0) {
+        //     const OPTION_ELEMENT = $("<option>").attr("value", "N/A").text("N/A");
+        //     SELECT_ELEMENT.append(OPTION_ELEMENT);
+        // }
+        // if (isEdit) {
+        //     const SELECT_LABEL = $("<label>").text(`${module.moduleSteps[STEP_KEY].name}:`);
+        //     const FORM = positionElement.find("form");
+        //     SELECT_LABEL.append(SELECT_ELEMENT);
+        //     FORM.append(SELECT_LABEL);
+        // } else {
+        //     botMessage.append(SELECT_ELEMENT);
+        // }
+        // $(SELECT_ELEMENT).chosen();
+        // $(SELECT_ELEMENT).on("change", async (evt, params) => {
+        //     const { moduleKey, moduleSteps } = module;
+        //     const { key, name } = moduleSteps[STEP_KEY];
+        //     utils.savePropToSessionStorage(moduleKey, key, name, "dropDown", params.selected, step);
+        //     if (isEdit) return;
+        //     $(SELECT_ELEMENT).prop("disabled", true).trigger("chosen:updated");
+        //     insertMessage(params.selected, "outgoing");
+        //     await moduleRequest.moduleStepper(module, step + 1);
+        // });
+        // return SELECT_ELEMENT;
     },
 
     insertValue: async (module, step, positionElement, isEdit, value) => {
@@ -449,6 +626,8 @@ const messageHandler = {
         }
     },
 
+    insertAttachmentOptionWithSubOptions: async (module, step, positionElement, isEdit) => {},
+
     insertChosenSelect: async (module, step, positionElement, isEdit, value) => {
         const { insertMessage } = messageHandler;
         const STEP_KEY = `step${step}`;
@@ -495,7 +674,7 @@ const messageHandler = {
             const { moduleKey, moduleSteps } = module;
             const { key, name } = moduleSteps[STEP_KEY];
 
-            utils.savePropToSessionStorage(moduleKey, key, name, "options", params.selected, step);
+            utils.savePropToSessionStorage(moduleKey, key, name, "dropDown", params.selected, step);
             if (isEdit) return;
             $(SELECT_ELEMENT).prop("disabled", true).trigger("chosen:updated");
             insertMessage(params.selected, "outgoing");
@@ -580,6 +759,8 @@ const moduleRequest = {
             insertValue,
             insertSummary,
             insertFetchedOptions,
+            insertAttachmentOptionWithSubOptions,
+            insertOptions,
         } = messageHandler;
 
         switch (type) {
@@ -589,7 +770,7 @@ const moduleRequest = {
             case "value":
                 await insertValue(module, step);
                 break;
-            case "options":
+            case "dropDown":
                 await insertChosenSelect(module, step);
                 break;
             case "attachments":
@@ -598,9 +779,15 @@ const moduleRequest = {
             case "fetchedOptions":
                 await insertFetchedOptions(module, step);
                 break;
+            case "optionsWithSubOptions":
+                await insertAttachmentOptionWithSubOptions(module, step);
+                break;
+            case "dropDown":
+                insertOptions(module, step);
+                break;
             default:
                 await insertSummary(module.moduleKey, module);
-                break; // Return early for the "summary" case
+                break;
         }
     },
 
@@ -612,6 +799,7 @@ const moduleRequest = {
             insertValue,
             insertSummary,
             insertFetchedOptions,
+            insertOptions,
         } = messageHandler;
         switch (type) {
             case "date":
@@ -619,19 +807,20 @@ const moduleRequest = {
                 await insertDatePicker(module, step, editMessage, true, value);
                 break;
             case "value":
-                debugger;
                 await insertValue(module, step, editMessage, true, value);
                 break;
-            case "options":
+            case "dropDown":
                 await insertChosenSelect(module, step, editMessage, true, value);
+                break;
+            case "options":
+                await insertOptions(module, step, editMessage, true, value);
                 break;
             case "attachments":
                 await insertAttachment(module, step, editMessage, true, value);
                 break;
-            case "fetchedOptions":
-                // await insertFetchedOptions(module, step, editMessage, true, value);
-                await insertChosenSelect(module, step, editMessage, true, value);
-                break;
+            // case "fetchedOptions":
+            //     await insertFetchedOptions(module, step, editMessage, true, value);
+            //     break;
             default:
                 await insertSummary(module, step);
                 break; // Return early for the "summary" case
@@ -639,6 +828,7 @@ const moduleRequest = {
     },
 
     edit: async (module) => {
+        debugger;
         const FORM = $("<form>").addClass("module-edit-form");
         const MODULE_KEY = module.moduleKey;
         const REQUEST_DATA = utils.getReqFromSessionStorage(MODULE_KEY);
@@ -691,7 +881,7 @@ const formHandler = {
 // Define interaction handling functions
 const interactionHandler = {
     handleChatBotToggler: async () => {
-        const { chatBotWrapper } = elements;
+        const { chatBotWrapper, restartBtn } = elements;
         chatBotWrapper.toggleClass("opened");
         if (!chatBotWrapper.hasClass("loaded")) {
             chatBotWrapper.addClass("loaded");
@@ -710,14 +900,38 @@ const interactionHandler = {
         }
         $(widthBtnToggler).toggleClass("rotated");
     },
+
+    restartChat: () => {
+        const { header, chatBotStatus, chatBox, chatBotInputArea, restartConfirmationMessage } =
+            elements;
+        restartConfirmationMessage.css("display", "flex");
+        utils.blurElements(header, chatBotStatus, chatBox, chatBotInputArea);
+    },
+
+    cancelRestartMessage: () => {
+        const { header, chatBotStatus, chatBox, chatBotInputArea, restartConfirmationMessage } =
+            elements;
+        restartConfirmationMessage.css("display", "none");
+        utils.removeBlur(header, chatBotStatus, chatBox, chatBotInputArea);
+    },
 };
 
 // Define initialization function
 const init = () => {
     // Set up event listeners
     // Show starting main menu
-    const { chatbotToggler, closeBtn, chatInput, widthBtnToggler } = elements;
-    const { handleChatBotToggler, handleWidthBtnToggler, chatBotWrapper } = interactionHandler;
+    const {
+        chatbotToggler,
+        closeBtn,
+        chatInput,
+        widthBtnToggler,
+        restartBtn,
+        restartConfirmationMessageYesBtn,
+        restartConfirmationMessageNoBtn,
+        chatBox,
+    } = elements;
+    const { handleChatBotToggler, handleWidthBtnToggler, restartChat, cancelRestartMessage } =
+        interactionHandler;
 
     widthBtnToggler.on("click", handleWidthBtnToggler);
 
@@ -729,6 +943,16 @@ const init = () => {
         chatInput.css("height", "auto");
         chatInput.css("height", `${constants.CHAT_INPUT_INITIAL_HEIGHT}px`);
     });
+
+    restartBtn.on("click", restartChat);
+
+    restartConfirmationMessageYesBtn.on("click", () => {
+        chatBox.empty();
+        moduleRequest.start();
+        cancelRestartMessage();
+    });
+
+    restartConfirmationMessageNoBtn.on("click", cancelRestartMessage);
 };
 
 // Initialize the chatbot
