@@ -37,6 +37,38 @@ const constants = {
     TYPING_SPEED: 0,
 };
 
+const validation = {
+    validateIsNumber: (val) => {
+        if (val.trim().length === 0) {
+            return { error: true, reason: "Input value is required" };
+        }
+
+        if (isNaN(Number(val))) {
+            return { error: true, reason: "Input must be a valid number" };
+        }
+
+        return { error: false };
+    },
+
+    validateMin: (val, min) => {
+        if (val.trim().length === 0) {
+            return { error: true, reason: "Input value is required" };
+        }
+
+        if (isNaN(Number(val))) {
+            return { error: true, reason: "Input must be a valid number" };
+        }
+
+        // Check if the input value is within the specified range
+        if (val < min) {
+            return { error: true, reason: `Input must be more than ${min}` };
+        }
+
+        // If all checks pass, return no error
+        return { error: false };
+    },
+};
+
 // // Define leave request modules
 // const requestModules = {
 //     leaveRequestModule: {
@@ -144,11 +176,12 @@ const requestModules = {
         moduleName: "leave request",
         moduleKey: "leaveRequestModule",
         moduleLabel: "Apply for leave",
+        totalStepsNum: 7,
         moduleSteps: {
             step1: {
                 defaultOption: "Select one option",
                 message: "Are you going abroad?",
-                type: "dropDown",
+                type: "options",
                 name: "going abroad",
                 key: "goingAbroad",
                 stepNum: 1,
@@ -160,7 +193,7 @@ const requestModules = {
             step2: {
                 defaultOption: "Select one option",
                 message: "Do you need advanced payment?",
-                type: "dropDown",
+                type: "options",
                 name: "advanced payment",
                 key: "advancedPayment",
                 stepNum: 2,
@@ -206,15 +239,35 @@ const requestModules = {
             },
             step7: {
                 message: `Since you're ${constants.AST_VALUE} please deputize your approvals?`,
-                type: "dropDown",
+                type: "doubleDropDown",
                 name: "deputize type",
                 key: "deputizeType",
                 stepNum: 7,
                 link: "step8",
                 options: [
-                    { value: "All locations", text: "All locations" },
-                    { value: "Same location", text: "Same location" },
-                    { value: "My manager", text: "My manager" },
+                    {
+                        value: "All locations",
+                        text: "All locations",
+                        subOptions: [
+                            { value: "Option 1", text: "Option 1" },
+                            { value: "Option 2", text: "Option 2" },
+                            { value: "Option 3", text: "Option 3" },
+                        ],
+                    },
+                    {
+                        value: "Same location",
+                        text: "Same location",
+                        subOptions: [
+                            { value: "Option 4", text: "Option 4" },
+                            { value: "Option 5", text: "Option 5" },
+                            { value: "Option 6", text: "Option 6" },
+                        ],
+                    },
+                    {
+                        value: "My manager",
+                        text: "My manager",
+                        subOptions: [],
+                    },
                 ],
             },
         },
@@ -326,7 +379,7 @@ const utils = {
 
 // Define message handling functions
 const messageHandler = {
-    insertMessage: async (message, className) => {
+    insertMessage: async (message, className, step) => {
         const chatLi = $("<li>").addClass("chat").addClass(className);
         const { chatBox } = elements;
         chatBox.append(chatLi);
@@ -340,6 +393,12 @@ const messageHandler = {
 
         utils.scrollToBottom();
         return chatLi;
+    },
+
+    insertStepValue: (chatLi, module, step) => {
+        const STEP_INDICATOR = $("<i>").addClass("step-indicator");
+        chatLi.append(STEP_INDICATOR);
+        STEP_INDICATOR.text(`Step ${step} out of ${module.totalStepsNum}`);
     },
 
     insertButton: async (positionElement, btnText, btnClickHandler, active = false) => {
@@ -377,6 +436,7 @@ const messageHandler = {
                 module.moduleSteps[STEP_KEY].message,
                 "incoming"
             );
+            messageHandler.insertStepValue(botMessage, module, step);
             $(botMessage).css("row-gap", "10px");
             optionsDiv = await messageHandler.insertOptionsDiv(botMessage);
 
@@ -430,84 +490,66 @@ const messageHandler = {
     },
 
     insertOptions: async (module, step, positionElement, isEdit, value) => {
-        const { insertMessage, insertOptionsDiv, insertButton } = messageHandler;
-        const { options, message } = module.moduleSteps[STEP_KEY];
-        const MESSAGE = await insertMessage(message, "incoming with-options");
-        const OPTIONS_DIV = await insertOptionsDiv(MESSAGE);
+        if (isEdit) {
+            debugger;
+            await messageHandler.insertChosenSelect(module, step, positionElement, isEdit, value);
+        } else {
+            const STEP_KEY = `step${step}`;
+            const { insertMessage, insertOptionsDiv, insertButton } = messageHandler;
+            const { options, message, key } = module.moduleSteps[STEP_KEY];
 
-        options.forEach(async (option) => {
-            await insertButton(OPTIONS_DIV, option.text, () => {
-                const val = option.value;
-                utils.savePropToSessionStorage(moduleKey, key, name, "dropDown", val, step);
+            const BOT_MESSAGE = await insertMessage(message, "incoming with-options");
+            const OPTIONS_DIV = await insertOptionsDiv(BOT_MESSAGE);
+
+            messageHandler.insertStepValue(BOT_MESSAGE, module, step);
+            options.forEach(async (option) => {
+                await insertButton(OPTIONS_DIV, option.text, () => {
+                    const val = option.value;
+                    utils.savePropToSessionStorage(
+                        module.moduleKey,
+                        key,
+                        val,
+                        "dropDown",
+                        val,
+                        step
+                    );
+                    const OPTIONS_BUTTONS = $(OPTIONS_DIV).find("button");
+                    OPTIONS_BUTTONS.each(function () {
+                        utils.disableElement($(this));
+                    });
+                    moduleRequest.moduleStepper(module, step + 1);
+                });
             });
-        });
-
-        // const { insertMessage } = messageHandler;
-        // const STEP_KEY = `step${step}`;
-        // let botMessage;
-        // if (!isEdit) {
-        //     botMessage = await insertMessage(module.moduleSteps[STEP_KEY].message, "incoming");
-        //     $(botMessage).css("row-gap", "10px");
-        // }
-        // const OPTIONS_LIST = module.moduleSteps[STEP_KEY].options;
-        // const SELECT_ELEMENT = $("<select>");
-        // if (!isEdit) {
-        //     const DEFAULT_OPTION_TEXT = module.moduleSteps[STEP_KEY].defaultOption;
-        //     const DEFAULT_OPTION = $("<option>")
-        //         .attr("value", "")
-        //         .text(DEFAULT_OPTION_TEXT)
-        //         .prop("disabled", true)
-        //         .prop("selected", true);
-        //     SELECT_ELEMENT.append(DEFAULT_OPTION);
-        // }
-        // OPTIONS_LIST.forEach((option) => {
-        //     const OPTION_ELEMENT = $("<option>").attr("value", option.value).text(option.text);
-        //     if (isEdit && option.text === value) {
-        //         OPTION_ELEMENT.prop("selected", true);
-        //     }
-        //     SELECT_ELEMENT.append(OPTION_ELEMENT);
-        // });
-        // if (OPTIONS_LIST.length == 0) {
-        //     const OPTION_ELEMENT = $("<option>").attr("value", "N/A").text("N/A");
-        //     SELECT_ELEMENT.append(OPTION_ELEMENT);
-        // }
-        // if (isEdit) {
-        //     const SELECT_LABEL = $("<label>").text(`${module.moduleSteps[STEP_KEY].name}:`);
-        //     const FORM = positionElement.find("form");
-        //     SELECT_LABEL.append(SELECT_ELEMENT);
-        //     FORM.append(SELECT_LABEL);
-        // } else {
-        //     botMessage.append(SELECT_ELEMENT);
-        // }
-        // $(SELECT_ELEMENT).chosen();
-        // $(SELECT_ELEMENT).on("change", async (evt, params) => {
-        //     const { moduleKey, moduleSteps } = module;
-        //     const { key, name } = moduleSteps[STEP_KEY];
-        //     utils.savePropToSessionStorage(moduleKey, key, name, "dropDown", params.selected, step);
-        //     if (isEdit) return;
-        //     $(SELECT_ELEMENT).prop("disabled", true).trigger("chosen:updated");
-        //     insertMessage(params.selected, "outgoing");
-        //     await moduleRequest.moduleStepper(module, step + 1);
-        // });
-        // return SELECT_ELEMENT;
+        }
     },
 
     insertValue: async (module, step, positionElement, isEdit, value) => {
-        debugger;
         const STEP_KEY = `step${step}`;
         const { message, placeHolder, key, name, type } = module.moduleSteps[STEP_KEY];
         const { activeChatInput, resetChatInput, savePropToSessionStorage } = utils;
         const { sendMessageIcon, sendChatBtn, chatInput } = elements;
+
+        // Remove existing event handlers
+        chatInput.off("keydown");
+        sendMessageIcon.off("click");
+        sendChatBtn.off("click");
+
         if (!isEdit) {
-            await messageHandler.insertMessage(message, "incoming");
+            const BOT_MESSAGE = await messageHandler.insertMessage(message, "incoming");
+            messageHandler.insertStepValue(BOT_MESSAGE, module, step);
             activeChatInput(placeHolder);
             const handleChatInput = async () => {
-                const userMessage = chatInput.val().trim();
-                if (!userMessage) return;
-                resetChatInput();
-                savePropToSessionStorage(module.moduleKey, key, name, type, userMessage, step);
-                await messageHandler.insertMessage(userMessage, "outgoing");
-                await moduleRequest.moduleStepper(module, step + 1);
+                const USER_VALUE = chatInput.val();
+                const VALIDATE = validation.validateMin(USER_VALUE, 1);
+                if (VALIDATE.error) {
+                    const { reason } = VALIDATE;
+                    alertify.notify(reason, "error", 5, function () {});
+                } else {
+                    resetChatInput();
+                    savePropToSessionStorage(module.moduleKey, key, name, type, USER_VALUE, step);
+                    await messageHandler.insertMessage(USER_VALUE, "outgoing");
+                    await moduleRequest.moduleStepper(module, step + 1);
+                }
             };
 
             chatInput.on("keydown", (e) => {
@@ -517,7 +559,6 @@ const messageHandler = {
                 }
             });
 
-            sendMessageIcon.on("click", handleChatInput);
             sendChatBtn.on("click", handleChatInput);
         } else {
             const VALUE_INPUT = $("<input>").attr("type", "text"); // Create a new input element
@@ -542,6 +583,8 @@ const messageHandler = {
         const OPTIONS_DIV = await insertOptionsDiv(BOT_MESSAGE);
 
         BOT_MESSAGE.append(OPTIONS_DIV);
+
+        messageHandler.insertStepValue(BOT_MESSAGE, module, step);
 
         const yesOptionHandler = async () => {
             insertAttachment(module, step);
@@ -626,8 +669,6 @@ const messageHandler = {
         }
     },
 
-    insertAttachmentOptionWithSubOptions: async (module, step, positionElement, isEdit) => {},
-
     insertChosenSelect: async (module, step, positionElement, isEdit, value) => {
         const { insertMessage } = messageHandler;
         const STEP_KEY = `step${step}`;
@@ -635,6 +676,7 @@ const messageHandler = {
         if (!isEdit) {
             botMessage = await insertMessage(module.moduleSteps[STEP_KEY].message, "incoming");
             $(botMessage).css("row-gap", "10px");
+            messageHandler.insertStepValue(botMessage, module, step);
         }
         const OPTIONS_LIST = module.moduleSteps[STEP_KEY].options;
 
@@ -682,6 +724,147 @@ const messageHandler = {
         });
 
         return SELECT_ELEMENT;
+    },
+
+    insertAttachmentOptionWithSubOptions: async (module, step, positionElement, isEdit) => {
+        // step7: {
+        //     message: `Since you're ${constants.AST_VALUE} please deputize your approvals?`,
+        //     type: "doubleDropDown",
+        //     name: "deputize type",
+        //     key: "deputizeType",
+        //     stepNum: 7,
+        //     link: "step8",
+        //     options: [
+        //         {
+        //             value: "All locations",
+        //             text: "All locations",
+        //             subOptions: [
+        //                 { value: "Option 1", text: "Option 1" },
+        //                 { value: "Option 2", text: "Option 2" },
+        //                 { value: "Option 3", text: "Option 3" },
+        //             ],
+        //         },
+        //         {
+        //             value: "Same location",
+        //             text: "Same location",
+        //             subOptions: [
+        //                 { value: "Option 4", text: "Option 4" },
+        //                 { value: "Option 5", text: "Option 5" },
+        //                 { value: "Option 6", text: "Option 6" },
+        //             ],
+        //         },
+        //         {
+        //             value: "My manager",
+        //             text: "My manager",
+        //             subOptions: [],
+        //         },
+        //     ],
+        // },
+    },
+
+    insertDoubleChosenSelect: async (module, step, positionElement, isEdit, value) => {
+        const { insertMessage } = messageHandler;
+        const STEP_KEY = `step${step}`;
+        let botMessage;
+
+        // Insert incoming message if not in edit mode
+        if (!isEdit) {
+            botMessage = await insertMessage(module.moduleSteps[STEP_KEY].message, "incoming");
+            $(botMessage).css("row-gap", "10px");
+            messageHandler.insertStepValue(botMessage, module, step);
+        }
+
+        // Get options list
+        const OPTIONS_LIST = module.moduleSteps[STEP_KEY].options;
+
+        // Create and append the first select element
+        const FIRST_SELECT_ELEMENT = $("<select>");
+        if (!isEdit) {
+            const DEFAULT_OPTION_TEXT = module.moduleSteps[STEP_KEY].defaultOption;
+            const DEFAULT_OPTION = $("<option>")
+                .attr("value", "")
+                .text(DEFAULT_OPTION_TEXT)
+                .prop("disabled", true)
+                .prop("selected", true);
+            FIRST_SELECT_ELEMENT.append(DEFAULT_OPTION);
+        }
+        OPTIONS_LIST.forEach((option) => {
+            const OPTION_ELEMENT = $("<option>").attr("value", option.value).text(option.text);
+            FIRST_SELECT_ELEMENT.append(OPTION_ELEMENT);
+        });
+
+        // Append the first select element to the bot message or form
+        if (!isEdit) {
+            botMessage.append(FIRST_SELECT_ELEMENT);
+        } else {
+            const FIRST_SELECT_LABEL = $("<label>").text(`${module.moduleSteps[STEP_KEY].name}:`);
+            const FORM = positionElement.find("form");
+            FIRST_SELECT_LABEL.append(FIRST_SELECT_ELEMENT);
+            FORM.append(FIRST_SELECT_LABEL);
+        }
+
+        // Initialize the first select as chosen
+        $(FIRST_SELECT_ELEMENT).chosen();
+
+        // Create the second select element and append it to the bot message or form
+        const SECOND_SELECT_ELEMENT = $("<select>");
+        if (isEdit && value) {
+            const SUB_OPTIONS =
+                OPTIONS_LIST.find((option) => option.value === value)?.subOptions || [];
+            SUB_OPTIONS.forEach((subOption) => {
+                const SUB_OPTION_ELEMENT = $("<option>")
+                    .attr("value", subOption.value)
+                    .text(subOption.text);
+                SECOND_SELECT_ELEMENT.append(SUB_OPTION_ELEMENT);
+            });
+        }
+
+        // Append the second select element to the bot message or form
+        if (!isEdit) {
+            botMessage.append(SECOND_SELECT_ELEMENT);
+        } else {
+            const SECOND_SELECT_LABEL = $("<label>").text(`${module.moduleSteps[STEP_KEY].name}:`);
+            const FORM = positionElement.find("form");
+            SECOND_SELECT_LABEL.append(SECOND_SELECT_ELEMENT);
+            FORM.append(SECOND_SELECT_LABEL);
+        }
+
+        // Initialize the second select as chosen
+        $(SECOND_SELECT_ELEMENT).chosen();
+
+        // Handle change event for the first select
+        $(FIRST_SELECT_ELEMENT).on("change", async (evt, params) => {
+            const { moduleKey, moduleSteps } = module;
+            const { key, name } = moduleSteps[STEP_KEY];
+
+            // Clear options of the second select
+            $(SECOND_SELECT_ELEMENT).empty();
+
+            // Populate options of the second select based on the selection in the first select
+            const SUB_OPTIONS =
+                OPTIONS_LIST.find((option) => option.value === params.selected)?.subOptions || [];
+            SUB_OPTIONS.forEach((subOption) => {
+                const SUB_OPTION_ELEMENT = $("<option>")
+                    .attr("value", subOption.value)
+                    .text(subOption.text);
+                SECOND_SELECT_ELEMENT.append(SUB_OPTION_ELEMENT);
+            });
+
+            // Update session storage
+            utils.savePropToSessionStorage(moduleKey, key, name, "dropDown", params.selected, step);
+
+            // If in edit mode, return
+            if (isEdit) return;
+
+            // Disable first select and trigger chosen:updated event
+            $(FIRST_SELECT_ELEMENT).prop("disabled", true).trigger("chosen:updated");
+
+            // Insert outgoing message and proceed to the next step
+            insertMessage(params.selected, "outgoing");
+            await moduleRequest.moduleStepper(module, step + 1);
+        });
+
+        return [FIRST_SELECT_ELEMENT, SECOND_SELECT_ELEMENT];
     },
 
     insertSummary: async (requestItemName, module) => {
@@ -773,16 +956,16 @@ const moduleRequest = {
             case "dropDown":
                 await insertChosenSelect(module, step);
                 break;
+            case "doubleDropDown":
+                await insertDoubleChosenSelect(module, step, editMessage, true, value);
+                break;
             case "attachments":
                 await insertAttachmentOption(module, step);
                 break;
             case "fetchedOptions":
                 await insertFetchedOptions(module, step);
                 break;
-            case "optionsWithSubOptions":
-                await insertAttachmentOptionWithSubOptions(module, step);
-                break;
-            case "dropDown":
+            case "options":
                 insertOptions(module, step);
                 break;
             default:
@@ -798,12 +981,10 @@ const moduleRequest = {
             insertAttachment,
             insertValue,
             insertSummary,
-            insertFetchedOptions,
             insertOptions,
         } = messageHandler;
         switch (type) {
             case "date":
-                debugger;
                 await insertDatePicker(module, step, editMessage, true, value);
                 break;
             case "value":
@@ -812,23 +993,22 @@ const moduleRequest = {
             case "dropDown":
                 await insertChosenSelect(module, step, editMessage, true, value);
                 break;
+            case "doubleDropDown":
+                await insertDoubleChosenSelect(module, step, editMessage, true, value);
+                break;
             case "options":
                 await insertOptions(module, step, editMessage, true, value);
                 break;
             case "attachments":
                 await insertAttachment(module, step, editMessage, true, value);
                 break;
-            // case "fetchedOptions":
-            //     await insertFetchedOptions(module, step, editMessage, true, value);
-            //     break;
             default:
                 await insertSummary(module, step);
-                break; // Return early for the "summary" case
+                break;
         }
     },
 
     edit: async (module) => {
-        debugger;
         const FORM = $("<form>").addClass("module-edit-form");
         const MODULE_KEY = module.moduleKey;
         const REQUEST_DATA = utils.getReqFromSessionStorage(MODULE_KEY);
