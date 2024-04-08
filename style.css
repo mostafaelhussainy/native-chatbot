@@ -320,7 +320,7 @@ header h2 {
     flex-direction: column;
     align-items: flex-start;
     list-style: none;
-    padding: 12px 16px;
+    padding: 12px 16px 18px;
     color: #fff;
     white-space: pre-wrap;
     font-size: 14px;
@@ -406,6 +406,24 @@ header h2 {
     bottom: 0;
 } */
 
+button:disabled,
+button:disabled::before {
+    color: #ccc;
+    cursor: initial;
+}
+
+button:disabled::before {
+    scale: 0 !important;
+}
+
+button:disabled svg g {
+    fill: #ccc;
+}
+
+button:disabled svg path {
+    fill: #ccc;
+}
+
 .messages-list .incoming .message-options button:disabled,
 .messages-list .incoming .message-options button:disabled label {
     color: #ccc;
@@ -457,7 +475,7 @@ header h2 {
     margin-bottom: 18px;
 }
 
-.messages-list .incoming .module-edit-form .module-edit-form__submit-btn {
+.messages-list .chat.incoming .to-right-btn {
     border: 1px solid #253544;
     color: #253544;
     padding: 2px 14px;
@@ -467,11 +485,11 @@ header h2 {
     border-radius: 24px;
     cursor: pointer;
     margin-left: auto;
-    width: max(10%, 67px);
+    margin-top: 10px;
     text-align: center;
     display: block;
 }
-.messages-list .incoming .module-edit-form .module-edit-form__submit-btn:disabled {
+.messages-list .chat.incoming .to-right-btn:disabled {
     color: #ccc;
     border-color: #ccc;
     cursor: initial;
@@ -619,4 +637,56 @@ header h2 {
     background: none;
     border-radius: 0;
     box-shadow: none;
+}
+
+.chosen-container.chosen-with-drop .chosen-drop {
+    left: -20px !important;
+}
+
+.attachment-delete-button {
+    width: 40px;
+    height: 40px;
+}
+
+.attachment-delete-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.attachment-add-button {
+    width: 44px;
+    height: 48px;
+    position: absolute;
+    top: 0;
+    right: 5px;
+}
+
+.attachment-add-button svg {
+    width: 22px;
+    height: 24px;
+}
+
+.attachments-list {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+}
+
+.attachment-label {
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.attachment-label.hidden {
+    display: none;
+}
+
+.attachment-label input {
+    width: 70%;
 }

@@ -30,11 +30,22 @@ const constants = {
     EDIT: "Wait, I want to edit!",
     BACK_TO_MENU: "No, go back to main menu!",
     EDIT_MESSAGE: "Feel free to edit any fields from below and save to proceed",
+    MAX_ATTACHMENTS_NUM_MESSAGE:
+        "You've reached the limit number of attachments, you can delete one to add another attachment",
+    ZERO_ATTACHMENTS_NUM_MESSAGE:
+        "You've to upload at least one file before going to the next step",
     NO_OPTIONS_FETCHED: "N/A",
     YES: "Yes",
     NO: "No",
     CHAT_INPUT_INITIAL_HEIGHT: elements.chatInput.scrollHeight,
     TYPING_SPEED: 0,
+};
+
+const icons = {
+    ADD_ICON:
+        '<svg fill="none" height="16" viewBox="0 0 16 16" width="16" xmlns="http://www.w3.org/2000/svg"><g fill="#17a13a"><path d="m6 1c-1.10457 0-2 .89543-2 2v2.20703c.32228-.09115.65659-.15366 1-.18461v-2.02242c0-.55228.44772-1 1-1h3v2.5c0 .82843.67157 1.5 1.5 1.5h2.5v7c0 .5523-.4477 1-1 1h-2.25716c-.31336.3794-.67663.7161-1.07976 1h3.33692c1.1046 0 2-.8954 2-2v-7.58579c0-.39782-.158-.77935-.4393-1.06066l-2.9143-2.91421c-.2813-.2813-.66279-.43934-1.06061-.43934zm6.7929 4h-2.2929c-.2761 0-.5-.22386-.5-.5v-2.29289z"/><path d="m10 10.5c0 2.4853-2.01472 4.5-4.5 4.5s-4.5-2.0147-4.5-4.5c0-2.48528 2.01472-4.5 4.5-4.5s4.5 2.01472 4.5 4.5zm-4-2c0-.27614-.22386-.5-.5-.5s-.5.22386-.5.5v1.5h-1.5c-.27614 0-.5.2239-.5.5s.22386.5.5.5h1.5v1.5c0 .2761.22386.5.5.5s.5-.2239.5-.5v-1.5h1.5c.27614 0 .5-.2239.5-.5s-.22386-.5-.5-.5h-1.5z"/></g></svg>',
+    DELETE_ICON:
+        '<svg height="8" viewBox="0 0 8 8" width="8" xmlns="http://www.w3.org/2000/svg"><path fill="red" d="m3 0c-.55 0-1 .45-1 1h-1c-.55 0-1 .45-1 1h7c0-.55-.45-1-1-1h-1c0-.55-.45-1-1-1zm-2 3v4.81c0 .11.08.19.19.19h4.63c.11 0 .19-.08.19-.19v-4.81h-1v3.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-3.5h-1v3.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-3.5h-1z"/></svg>',
 };
 
 const validation = {
@@ -69,108 +80,6 @@ const validation = {
     },
 };
 
-// // Define leave request modules
-// const requestModules = {
-//     leaveRequestModule: {
-//         moduleName: "leave request",
-//         moduleKey: "leaveRequestModule",
-//         moduleLabel: "Apply for leave",
-//         moduleSteps: {
-//             step1: {
-//                 defaultOption: "Select one option",
-//                 message: "Are you going abroad?",
-//                 type: "dropDown",
-//                 name: "going abroad",
-//                 key: "goingAbroad",
-//                 stepNum: 1,
-//                 options: [
-//                     { value: "Yes", text: "Yes" },
-//                     { value: "No", text: "No" },
-//                 ],
-//             },
-//             step2: {
-//                 defaultOption: "Select one option",
-//                 message: "Do you need advanced payment?",
-//                 type: "dropDown",
-//                 name: "advanced payment",
-//                 key: "advancedPayment",
-//                 stepNum: 2,
-//                 options: [
-//                     { value: "Yes", text: "Yes" },
-//                     { value: "No", text: "No" },
-//                 ],
-//             },
-//             step3: {
-//                 type: "date",
-//                 name: "starting date",
-//                 message: "Pick your starting date",
-//                 key: "startingDate",
-//                 stepNum: 3,
-//             },
-//             step4: {
-//                 message: "Please enter your number of days",
-//                 placeHolder: "Enter your number of days",
-//                 type: "value",
-//                 name: "number of days",
-//                 key: "numberOfDays",
-//                 stepNum: 4,
-//             },
-//             step5: {
-//                 defaultOption: "Select one option",
-//                 message: "Please choose your leave type",
-//                 type: "dropDown",
-//                 name: "leave type",
-//                 key: "leaveType",
-//                 stepNum: 5,
-//                 options: [
-//                     { value: "Type 1", text: "Type 1" },
-//                     { value: "Type 2", text: "Type 2" },
-//                     { value: "Type 3", text: "Type 3" },
-//                 ],
-//             },
-//             step6: {
-//                 message: "Do you want to upload any attachments?",
-//                 type: "attachments",
-//                 name: "attachment name",
-//                 key: "attachmentName",
-//                 stepNum: 6,
-//             },
-//             step7: {
-//                 message: `Since you're ${constants.AST_VALUE} please deputize your approvals?`,
-//                 type: "optionsWithSubOptions",
-//                 name: "deputize type",
-//                 key: "deputizeType",
-//                 stepNum: 7,
-//                 options: [
-//                     {
-//                         value: "All locations",
-//                         text: "All locations",
-//                         subList: [
-//                             { value: "option 1", text: "option 1" },
-//                             { value: "option 2", text: "option 2" },
-//                             { value: "option 3", text: "option 3" },
-//                         ],
-//                     },
-//                     {
-//                         value: "Same location",
-//                         text: "Same location",
-//                         subList: [
-//                             { value: "option 4", text: "option 4" },
-//                             { value: "option 5", text: "option 5" },
-//                             { value: "option 6", text: "option 6" },
-//                         ],
-//                     },
-//                     {
-//                         value: "My manager",
-//                         text: "My manager",
-//                         subList: [],
-//                     },
-//                 ],
-//                 subMessage: "Select your deputize",
-//             },
-//         },
-//     },
-// };
 const requestModules = {
     leaveRequestModule: {
         moduleName: "leave request",
@@ -178,98 +87,98 @@ const requestModules = {
         moduleLabel: "Apply for leave",
         totalStepsNum: 7,
         moduleSteps: {
+            // step1: {
+            //     defaultOption: "Select one option",
+            //     message: "Are you going abroad?",
+            //     type: "options",
+            //     name: "going abroad",
+            //     key: "goingAbroad",
+            //     stepNum: 1,
+            //     options: [
+            //         { value: "Yes", text: "Yes" },
+            //         { value: "No", text: "No" },
+            //     ],
+            // },
+            // step2: {
+            //     defaultOption: "Select one option",
+            //     message: "Do you need advanced payment?",
+            //     type: "options",
+            //     name: "advanced payment",
+            //     key: "advancedPayment",
+            //     stepNum: 2,
+            //     options: [
+            //         { value: "Yes", text: "Yes" },
+            //         { value: "No", text: "No" },
+            //     ],
+            // },
+            // step3: {
+            //     type: "date",
+            //     name: "starting date",
+            //     message: "Pick your starting date",
+            //     key: "startingDate",
+            //     stepNum: 3,
+            // },
+            // step4: {
+            //     message: "Please enter your number of days",
+            //     placeHolder: "Enter your number of days",
+            //     type: "value",
+            //     name: "number of days",
+            //     key: "numberOfDays",
+            //     stepNum: 4,
+            // },
+            // step5: {
+            //     defaultOption: "Select one option",
+            //     message: "Please choose your leave type",
+            //     type: "dropDown",
+            //     name: "leave type",
+            //     key: "leaveType",
+            //     stepNum: 5,
+            //     options: [
+            //         { value: "Type 1", text: "Type 1" },
+            //         { value: "Type 2", text: "Type 2" },
+            //         { value: "Type 3", text: "Type 3" },
+            //     ],
+            // },
             step1: {
-                defaultOption: "Select one option",
-                message: "Are you going abroad?",
-                type: "options",
-                name: "going abroad",
-                key: "goingAbroad",
-                stepNum: 1,
-                options: [
-                    { value: "Yes", text: "Yes" },
-                    { value: "No", text: "No" },
-                ],
-            },
-            step2: {
-                defaultOption: "Select one option",
-                message: "Do you need advanced payment?",
-                type: "options",
-                name: "advanced payment",
-                key: "advancedPayment",
-                stepNum: 2,
-                options: [
-                    { value: "Yes", text: "Yes" },
-                    { value: "No", text: "No" },
-                ],
-            },
-            step3: {
-                type: "date",
-                name: "starting date",
-                message: "Pick your starting date",
-                key: "startingDate",
-                stepNum: 3,
-            },
-            step4: {
-                message: "Please enter your number of days",
-                placeHolder: "Enter your number of days",
-                type: "value",
-                name: "number of days",
-                key: "numberOfDays",
-                stepNum: 4,
-            },
-            step5: {
-                defaultOption: "Select one option",
-                message: "Please choose your leave type",
-                type: "dropDown",
-                name: "leave type",
-                key: "leaveType",
-                stepNum: 5,
-                options: [
-                    { value: "Type 1", text: "Type 1" },
-                    { value: "Type 2", text: "Type 2" },
-                    { value: "Type 3", text: "Type 3" },
-                ],
-            },
-            step6: {
                 message: "Do you want to upload any attachments?",
                 type: "attachments",
                 name: "attachment name",
                 key: "attachmentName",
-                stepNum: 6,
+                maxNumberOfAttachments: 3,
+                stepNum: 1,
             },
-            step7: {
-                message: `Since you're ${constants.AST_VALUE} please deputize your approvals?`,
-                type: "doubleDropDown",
-                name: "deputize type",
-                key: "deputizeType",
-                stepNum: 7,
-                link: "step8",
-                options: [
-                    {
-                        value: "All locations",
-                        text: "All locations",
-                        subOptions: [
-                            { value: "Option 1", text: "Option 1" },
-                            { value: "Option 2", text: "Option 2" },
-                            { value: "Option 3", text: "Option 3" },
-                        ],
-                    },
-                    {
-                        value: "Same location",
-                        text: "Same location",
-                        subOptions: [
-                            { value: "Option 4", text: "Option 4" },
-                            { value: "Option 5", text: "Option 5" },
-                            { value: "Option 6", text: "Option 6" },
-                        ],
-                    },
-                    {
-                        value: "My manager",
-                        text: "My manager",
-                        subOptions: [],
-                    },
-                ],
-            },
+            // step7: {
+            //     message: `Since you're ${constants.AST_VALUE} please deputize your approvals?`,
+            //     type: "doubleDropDown",
+            //     name: "deputize type",
+            //     key: "deputizeType",
+            //     stepNum: 7,
+            //     options: [
+            //         {
+            //             value: "All locations",
+            //             text: "All locations",
+            //             subOptions: [
+            //                 { value: "Option 1", text: "Option 1" },
+            //                 { value: "Option 2", text: "Option 2" },
+            //                 { value: "Option 3", text: "Option 3" },
+            //             ],
+            //         },
+            //         {
+            //             value: "Same location",
+            //             text: "Same location",
+            //             subOptions: [
+            //                 { value: "Option 4", text: "Option 4" },
+            //                 { value: "Option 5", text: "Option 5" },
+            //                 { value: "Option 6", text: "Option 6" },
+            //             ],
+            //         },
+            //         {
+            //             value: "My manager",
+            //             text: "My manager",
+            //             subOptions: [],
+            //         },
+            //     ],
+            // },
         },
     },
 };
@@ -277,7 +186,19 @@ const requestModules = {
 const utils = {
     scrollToBottom: () => elements.chatBox.scrollTop(elements.chatBox.prop("scrollHeight")),
 
-    disableElement: (element) => element.prop("disabled", true).css("color", "#ccc"),
+    disableElement: (element) => {
+        console.log(element);
+        element.prop("disabled", true).css({
+            color: "#ccc",
+            "border-color": "#ccc",
+        });
+    },
+
+    UnDisableElement: (element) =>
+        element.prop("disabled", false).css({
+            color: "#000",
+            "border-color": "#000",
+        }),
 
     disableDatePicker: (datePicker, callback) => {
         datePicker.datepicker("destroy");
@@ -349,31 +270,157 @@ const utils = {
         sessionStorage.setItem(reqName, JSON.stringify(req));
     },
 
+    saveDoublePropToSessionStorage: (
+        reqName,
+        propObjName,
+        propName,
+        propType,
+        propVal,
+        propState,
+        step,
+        notIncludedInSummary = false
+    ) => {
+        let req = JSON.parse(sessionStorage.getItem(reqName));
+        if (!req[propObjName]) {
+            req[propObjName] = {};
+        }
+        req[propObjName].name = propName;
+        req[propObjName].type = propType;
+        if (!req[propObjName].value) {
+            req[propObjName].value = {}; // Initialize value property if not found
+        }
+        req[propObjName].value[propState] = propVal;
+        req[propObjName].step = step;
+        req[propObjName].notIncludedInSummary = notIncludedInSummary;
+        sessionStorage.setItem(reqName, JSON.stringify(req));
+    },
+
     getReqFromSessionStorage: (reqName) => {
         return JSON.parse(sessionStorage.getItem(reqName));
     },
 
-    handleChangingAttachmentValue: (module, step, targetElement, isEdit) => {
-        const FILE = $(targetElement)[0].files[0];
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            const BINARY_STRING = event.target.result;
-            const moduleKey = module.moduleKey;
-            utils.savePropToSessionStorage(
-                moduleKey,
-                "attachment",
-                "attachment",
-                "attachments",
-                { fileName: FILE.name, binary: BINARY_STRING },
-                step
-            );
+    getAttachmentsAreaFromSessionStorage: (reqName) => {
+        const req = utils.getReqFromSessionStorage(reqName);
+        return req["attachment"]?.value || [];
+    },
 
-            if (!isEdit) {
-                await messageHandler.insertMessage(`You've uploaded: ${FILE.name}`, "incoming");
-                await moduleRequest.moduleStepper(module, step + 1);
-            }
-        };
-        reader.readAsBinaryString(FILE);
+    // handleChangingAttachmentValue: (module, step, targetElement, isEdit) => {
+    //     const FILE = $(targetElement)[0].files[0];
+    //     const reader = new FileReader();
+    //     reader.onload = async (event) => {
+    //         const BINARY_STRING = event.target.result;
+    //         const moduleKey = module.moduleKey;
+    //         utils.savePropToSessionStorage(
+    //             moduleKey,
+    //             "attachment",
+    //             "attachment",
+    //             "attachments",
+    //             { fileName: FILE.name, binary: BINARY_STRING },
+    //             step
+    //         );
+
+    //         if (!isEdit) {
+    //             await messageHandler.insertMessage(`You've uploaded: ${FILE.name}`, "incoming");
+    //             await moduleRequest.moduleStepper(module, step + 1);
+    //         }
+    //     };
+    //     reader.readAsBinaryString(FILE);
+    // },
+
+    // pre promises
+    // handleChangingAttachmentValue: (module, step, targetElement, isEdit) => {
+    //     const { getAttachmentsAreaFromSessionStorage, savePropToSessionStorage } = utils;
+    //     const FILE = $(targetElement)[0].files[0];
+    //     const reader = new FileReader();
+    //     reader.onload = async (event) => {
+    //         const BINARY_STRING = event.target.result;
+    //         const moduleKey = module.moduleKey;
+    //         const ATTACHMENTS_ARR = getAttachmentsAreaFromSessionStorage(module.moduleKey);
+    //         ATTACHMENTS_ARR.push({ fileName: FILE.name, binary: BINARY_STRING });
+    //         savePropToSessionStorage(
+    //             moduleKey,
+    //             "attachment",
+    //             "attachment",
+    //             "attachments",
+    //             ATTACHMENTS_ARR,
+    //             step
+    //         );
+    //     };
+    //     reader.readAsBinaryString(FILE);
+    // },
+
+    // handleChangingAttachmentValue: (module, step, targetElement, isEdit) => {
+    //     const { getAttachmentsAreaFromSessionStorage, savePropToSessionStorage } = utils;
+    //     const FILE = $(targetElement)[0].files[0];
+
+    //     return new Promise((resolve, reject) => {
+    //         const reader = new FileReader();
+    //         reader.onload = async (event) => {
+    //             try {
+    //                 const BINARY_STRING = event.target.result;
+    //                 const moduleKey = module.moduleKey;
+    //                 const ATTACHMENTS_ARR = getAttachmentsAreaFromSessionStorage(moduleKey);
+    //                 ATTACHMENTS_ARR.push({ fileName: FILE.name, binary: BINARY_STRING });
+    //                 savePropToSessionStorage(
+    //                     moduleKey,
+    //                     "attachment",
+    //                     "attachment",
+    //                     "attachments",
+    //                     ATTACHMENTS_ARR,
+    //                     step
+    //                 );
+    //                 resolve(); // Resolve the promise when processing is complete
+    //             } catch (error) {
+    //                 reject(error); // Reject the promise if there's an error
+    //             }
+    //         };
+
+    //         reader.onerror = (event) => {
+    //             reject(event.target.error); // Handle reader errors
+    //         };
+
+    //         reader.readAsBinaryString(FILE);
+    //     });
+    // },
+
+    handleChangingAttachmentValue: (module, step, targetElement, isEdit) => {
+        const { getAttachmentsAreaFromSessionStorage, savePropToSessionStorage } = utils;
+        const FILE = $(targetElement)[0].files[0];
+
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = async (event) => {
+                try {
+                    const BINARY_STRING = event.target.result;
+                    const moduleKey = module.moduleKey;
+                    const ATTACHMENTS_ARR = getAttachmentsAreaFromSessionStorage(moduleKey);
+
+                    const randomId = Math.random().toString(36).substring(2, 10);
+
+                    ATTACHMENTS_ARR.push({ fileId: randomId, fileName: FILE.name });
+
+                    savePropToSessionStorage(
+                        moduleKey,
+                        "attachment",
+                        "attachment",
+                        "attachments",
+                        ATTACHMENTS_ARR,
+                        step
+                    );
+
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            reader.onerror = (event) => {
+                reject(event.target.error);
+            };
+
+            reader.readAsBinaryString(FILE);
+        });
     },
 };
 
@@ -491,7 +538,6 @@ const messageHandler = {
 
     insertOptions: async (module, step, positionElement, isEdit, value) => {
         if (isEdit) {
-            debugger;
             await messageHandler.insertChosenSelect(module, step, positionElement, isEdit, value);
         } else {
             const STEP_KEY = `step${step}`;
@@ -618,35 +664,183 @@ const messageHandler = {
         await messageHandler.insertButton(OPTIONS_DIV, NO, noOptionHandler);
     },
 
+    insertInputFile: (positionElement, module, step) => {
+        const LABEL = $("<label>").addClass("attachment-label");
+        const INPUT = $("<input>").attr({ type: "file" });
+        let fileId;
+        positionElement.append(LABEL);
+
+        const DELETE_BUTTON = $("<button>").addClass("attachment-delete-button overlay-btn");
+        const deleteSVG = $(icons.DELETE_ICON);
+        DELETE_BUTTON.append(deleteSVG);
+        LABEL.append(INPUT, DELETE_BUTTON);
+        DELETE_BUTTON.click(() => {
+            LABEL.remove();
+            const ATTACHMENTS_ARR = utils.getAttachmentsAreaFromSessionStorage(module.moduleKey);
+            const FILTERED_ARR = ATTACHMENTS_ARR.filter(
+                (attachment) => attachment.fileId != fileId
+            );
+            utils.savePropToSessionStorage(
+                module.moduleKey,
+                "attachment",
+                "attachment",
+                "attachments",
+                FILTERED_ARR,
+                step
+            );
+        });
+
+        INPUT.click(() => {
+            window.onfocus = function () {
+                setTimeout(async () => {
+                    if (INPUT[0].files.length === 0) {
+                        LABEL.remove();
+                    } else {
+                        await utils.handleChangingAttachmentValue(module, step, INPUT);
+                        const ATTACHMENTS = utils.getAttachmentsAreaFromSessionStorage(
+                            module.moduleKey
+                        );
+                        fileId = ATTACHMENTS[ATTACHMENTS.length - 1].fileId;
+                        const FILE_NAME = ATTACHMENTS[ATTACHMENTS.length - 1].fileName;
+                        INPUT.hide();
+                        const FILE_ANCHOR = $("<a>")
+                            .attr({
+                                href: "/",
+                                download: FILE_NAME,
+                            })
+                            .text(FILE_NAME);
+
+                        LABEL.prepend(FILE_ANCHOR);
+                    }
+                }, 500);
+                window.onfocus = null;
+            };
+        });
+
+        INPUT.click();
+    },
+
     insertAttachment: async (module, step, positionElement, isEdit, value) => {
         if (isEdit) {
             const STEP_KEY = `step${step}`;
+            console.log("value", value);
+            const INPUTS_AREA = $("<div>").addClass("attachments-list");
+            positionElement.append(INPUTS_AREA);
+            const ATTACHMENTS_NUM = value.length;
+            const MAX_ATTACHMENTS_NUM = module.moduleSteps[STEP_KEY].maxNumberOfAttachments;
 
-            const BLOB = new Blob([value.binary], { type: "application/octet-stream" });
-            const FILE = new File([BLOB], value.fileName);
-            const INPUT = $("<input>").attr("type", "file");
-            const LABEL = $("<label>")
-                .text(`${module.moduleSteps[STEP_KEY].name}:`)
-                .css("width", "100%");
-            LABEL.append(INPUT);
-
-            const FORM = positionElement.find("form");
-            FORM.append(LABEL);
-
-            const FILES_LIST = new DataTransfer();
-            FILES_LIST.items.add(FILE);
-            if (value.fileName && value.binary) {
-                INPUT[0].files = FILES_LIST.files;
-            }
-
-            INPUT.change((event) =>
-                utils.handleChangingAttachmentValue(module, step, event.target, isEdit)
+            const ADD_ATTACHMENT_BUTTON = $("<button>").addClass(
+                "attachment-add-button overlay-btn"
             );
+            const addSVG = $(icons.ADD_ICON);
+
+            ADD_ATTACHMENT_BUTTON.append(addSVG);
+            INPUTS_AREA.append(ADD_ATTACHMENT_BUTTON);
+            ADD_ATTACHMENT_BUTTON.on("click", () => {
+                if (ATTACHMENTS_NUM < MAX_ATTACHMENTS_NUM) {
+                    insertInputFile(INPUTS_AREA, module, step);
+                } else {
+                    alertify.notify(constants.MAX_ATTACHMENTS_NUM_MESSAGE, "error", 5);
+                }
+            });
+
+            value.forEach((file) => {
+                const LABEL = $("<label>").addClass("attachment-label");
+                const FILE_ID = file.fileId;
+                INPUTS_AREA.append(LABEL);
+                const DELETE_BUTTON = $("<button>").addClass(
+                    "attachment-delete-button overlay-btn"
+                );
+                const deleteSVG = $(icons.DELETE_ICON);
+                DELETE_BUTTON.append(deleteSVG);
+                LABEL.append(DELETE_BUTTON);
+
+                DELETE_BUTTON.click(() => {
+                    LABEL.remove();
+                    const ATTACHMENTS_ARR = utils.getAttachmentsAreaFromSessionStorage(
+                        module.moduleKey
+                    );
+                    const FILTERED_ARR = ATTACHMENTS_ARR.filter(
+                        (attachment) => attachment.fileId != FILE_ID
+                    );
+                    utils.savePropToSessionStorage(
+                        module.moduleKey,
+                        "attachment",
+                        "attachment",
+                        "attachments",
+                        FILTERED_ARR,
+                        step
+                    );
+                });
+
+                const FILE_ANCHOR = $("<a>")
+                    .attr({
+                        href: "/",
+                        download: file.fileName,
+                    })
+                    .text(file.fileName);
+
+                LABEL.prepend(FILE_ANCHOR);
+            });
         } else {
-            elements.attachmentInput.click();
-            elements.attachmentInput.change((event) =>
-                utils.handleChangingAttachmentValue(module, step, event.target, isEdit)
+            const STEP_KEY = `step${step}`;
+            const MAX_ATTACHMENTS_NUM = module.moduleSteps[STEP_KEY].maxNumberOfAttachments;
+
+            const { insertMessage, insertInputFile, insertButton } = messageHandler;
+            const ATTACHMENT_MESSAGE = await insertMessage(
+                "Insert one or more attachment as you need:",
+                "incoming"
             );
+            const INPUTS_AREA = $("<div>").addClass("attachments-list");
+            ATTACHMENT_MESSAGE.append(INPUTS_AREA);
+            insertInputFile(INPUTS_AREA, module, step);
+            const ADD_ATTACHMENT_BUTTON = $("<button>").addClass(
+                "attachment-add-button overlay-btn"
+            );
+            const addSVG = $(icons.ADD_ICON);
+
+            ADD_ATTACHMENT_BUTTON.append(addSVG);
+            ATTACHMENT_MESSAGE.append(ADD_ATTACHMENT_BUTTON);
+            ADD_ATTACHMENT_BUTTON.on("click", () => {
+                const ATTACHMENTS_NUM = INPUTS_AREA.find("label").length;
+                if (ATTACHMENTS_NUM < MAX_ATTACHMENTS_NUM) {
+                    insertInputFile(INPUTS_AREA, module, step);
+                } else {
+                    alertify.notify(constants.MAX_ATTACHMENTS_NUM_MESSAGE, "error", 5);
+                }
+            });
+
+            const nextStepBtnHandler = async () => {
+                // await messageHandler.insertMessage(`You've uploaded: ${FILE.name}`, "incoming");
+                const ATTACHMENTS = utils.getAttachmentsAreaFromSessionStorage(module.moduleKey);
+                if (ATTACHMENTS.length === 0) {
+                    alertify.notify(constants.ZERO_ATTACHMENTS_NUM_MESSAGE, "error", 5);
+                } else {
+                    let uploadedFilesMessage = `You've uploaded:\n`;
+                    ATTACHMENTS.forEach((file, index) => {
+                        if (index !== ATTACHMENTS.length - 1) {
+                            uploadedFilesMessage += `${file.fileName},\n`;
+                        } else {
+                            uploadedFilesMessage += `${file.fileName}`;
+                        }
+                    });
+                    await messageHandler.insertMessage(uploadedFilesMessage, "incoming");
+                    debugger;
+                    const ELEMENTS = ATTACHMENT_MESSAGE.find("button, input");
+                    ELEMENTS.each((index, el) => {
+                        utils.disableElement($(el));
+                    });
+                    await moduleRequest.moduleStepper(module, step + 1);
+                }
+            };
+
+            const NEXT_STEP_BTN = await insertButton(
+                ATTACHMENT_MESSAGE,
+                "Next step",
+                nextStepBtnHandler,
+                true
+            );
+            NEXT_STEP_BTN.addClass("to-right-btn");
         }
     },
 
@@ -726,46 +920,10 @@ const messageHandler = {
         return SELECT_ELEMENT;
     },
 
-    insertAttachmentOptionWithSubOptions: async (module, step, positionElement, isEdit) => {
-        // step7: {
-        //     message: `Since you're ${constants.AST_VALUE} please deputize your approvals?`,
-        //     type: "doubleDropDown",
-        //     name: "deputize type",
-        //     key: "deputizeType",
-        //     stepNum: 7,
-        //     link: "step8",
-        //     options: [
-        //         {
-        //             value: "All locations",
-        //             text: "All locations",
-        //             subOptions: [
-        //                 { value: "Option 1", text: "Option 1" },
-        //                 { value: "Option 2", text: "Option 2" },
-        //                 { value: "Option 3", text: "Option 3" },
-        //             ],
-        //         },
-        //         {
-        //             value: "Same location",
-        //             text: "Same location",
-        //             subOptions: [
-        //                 { value: "Option 4", text: "Option 4" },
-        //                 { value: "Option 5", text: "Option 5" },
-        //                 { value: "Option 6", text: "Option 6" },
-        //             ],
-        //         },
-        //         {
-        //             value: "My manager",
-        //             text: "My manager",
-        //             subOptions: [],
-        //         },
-        //     ],
-        // },
-    },
-
     insertDoubleChosenSelect: async (module, step, positionElement, isEdit, value) => {
-        const { insertMessage } = messageHandler;
+        const { insertMessage, insertButton } = messageHandler;
         const STEP_KEY = `step${step}`;
-        let botMessage;
+        let botMessage, firstSelectChoice, secondSelectChoice, nextStepBtn;
 
         // Insert incoming message if not in edit mode
         if (!isEdit) {
@@ -790,6 +948,9 @@ const messageHandler = {
         }
         OPTIONS_LIST.forEach((option) => {
             const OPTION_ELEMENT = $("<option>").attr("value", option.value).text(option.text);
+            if (isEdit && option.text == value.location) {
+                OPTION_ELEMENT.prop("selected", true);
+            }
             FIRST_SELECT_ELEMENT.append(OPTION_ELEMENT);
         });
 
@@ -806,15 +967,79 @@ const messageHandler = {
         // Initialize the first select as chosen
         $(FIRST_SELECT_ELEMENT).chosen();
 
+        // Handle change event for the first select
+        $(FIRST_SELECT_ELEMENT).on("change", async (evt, params) => {
+            const { moduleKey, moduleSteps } = module;
+            const { key, name } = moduleSteps[STEP_KEY];
+
+            // Clear options of the second select
+            $(SECOND_SELECT_ELEMENT).empty();
+
+            // Populate options of the second select based on the selection in the first select
+            const SUB_OPTIONS =
+                OPTIONS_LIST.find((option) => option.value === params.selected)?.subOptions || [];
+
+            if (SUB_OPTIONS.length > 0) {
+                const DEFAULT_OPTION_ELEMENT = $("<option>")
+                    .attr("value", "N/A")
+                    .text("Please select one option")
+                    .prop("disabled", true)
+                    .prop("selected", true);
+                SECOND_SELECT_ELEMENT.append(DEFAULT_OPTION_ELEMENT);
+                SUB_OPTIONS.forEach((subOption) => {
+                    const SUB_OPTION_ELEMENT = $("<option>")
+                        .attr("value", subOption.value)
+                        .text(subOption.text);
+                    SECOND_SELECT_ELEMENT.append(SUB_OPTION_ELEMENT);
+                });
+            } else {
+                const DEFAULT_OPTION_ELEMENT = $("<option>")
+                    .attr("value", "N/A")
+                    .text("N/A")
+                    .prop("disabled", true)
+                    .prop("selected", true);
+                SECOND_SELECT_ELEMENT.append(DEFAULT_OPTION_ELEMENT);
+            }
+
+            SECOND_SELECT_ELEMENT.trigger("chosen:updated");
+
+            utils.saveDoublePropToSessionStorage(
+                moduleKey,
+                key,
+                name,
+                "doubleDropDown",
+                params.selected,
+                "location",
+                step
+            );
+
+            secondSelectChoice = "N/A";
+            utils.saveDoublePropToSessionStorage(
+                moduleKey,
+                key,
+                name,
+                "doubleDropDown",
+                "N/A",
+                "deputize",
+                step
+            );
+
+            firstSelectChoice = params.selected;
+            utils.UnDisableElement(nextStepBtn);
+        });
+
         // Create the second select element and append it to the bot message or form
         const SECOND_SELECT_ELEMENT = $("<select>");
         if (isEdit && value) {
             const SUB_OPTIONS =
-                OPTIONS_LIST.find((option) => option.value === value)?.subOptions || [];
+                OPTIONS_LIST.find((option) => option.value === value.location)?.subOptions || [];
             SUB_OPTIONS.forEach((subOption) => {
                 const SUB_OPTION_ELEMENT = $("<option>")
                     .attr("value", subOption.value)
                     .text(subOption.text);
+                if (isEdit && subOption.text == value.deputize) {
+                    SUB_OPTION_ELEMENT.prop("selected", true);
+                }
                 SECOND_SELECT_ELEMENT.append(SUB_OPTION_ELEMENT);
             });
         }
@@ -832,37 +1057,34 @@ const messageHandler = {
         // Initialize the second select as chosen
         $(SECOND_SELECT_ELEMENT).chosen();
 
-        // Handle change event for the first select
-        $(FIRST_SELECT_ELEMENT).on("change", async (evt, params) => {
+        $(SECOND_SELECT_ELEMENT).on("change", async (evt, params) => {
             const { moduleKey, moduleSteps } = module;
             const { key, name } = moduleSteps[STEP_KEY];
 
-            // Clear options of the second select
-            $(SECOND_SELECT_ELEMENT).empty();
-
-            // Populate options of the second select based on the selection in the first select
-            const SUB_OPTIONS =
-                OPTIONS_LIST.find((option) => option.value === params.selected)?.subOptions || [];
-            SUB_OPTIONS.forEach((subOption) => {
-                const SUB_OPTION_ELEMENT = $("<option>")
-                    .attr("value", subOption.value)
-                    .text(subOption.text);
-                SECOND_SELECT_ELEMENT.append(SUB_OPTION_ELEMENT);
-            });
-
-            // Update session storage
-            utils.savePropToSessionStorage(moduleKey, key, name, "dropDown", params.selected, step);
-
-            // If in edit mode, return
-            if (isEdit) return;
-
-            // Disable first select and trigger chosen:updated event
-            $(FIRST_SELECT_ELEMENT).prop("disabled", true).trigger("chosen:updated");
-
-            // Insert outgoing message and proceed to the next step
-            insertMessage(params.selected, "outgoing");
-            await moduleRequest.moduleStepper(module, step + 1);
+            utils.saveDoublePropToSessionStorage(
+                moduleKey,
+                key,
+                name,
+                "doubleDropDown",
+                params.selected,
+                "deputize",
+                step
+            );
+            secondSelectChoice = params.selected;
         });
+
+        if (!isEdit) {
+            const handleNextStepBtn = async () => {
+                const SELECTION_MESSAGE = `You've chose ${firstSelectChoice} and ${secondSelectChoice}`;
+                insertMessage(SELECTION_MESSAGE, "outgoing");
+                await moduleRequest.moduleStepper(module, step + 1);
+                $(FIRST_SELECT_ELEMENT).prop("disabled", true).trigger("chosen:updated");
+                $(SECOND_SELECT_ELEMENT).prop("disabled", true).trigger("chosen:updated");
+            };
+            nextStepBtn = await insertButton(botMessage, "Next step", handleNextStepBtn);
+            utils.disableElement(nextStepBtn);
+            nextStepBtn.addClass("to-right-btn");
+        }
 
         return [FIRST_SELECT_ELEMENT, SECOND_SELECT_ELEMENT];
     },
@@ -874,10 +1096,27 @@ const messageHandler = {
         const { SUBMIT, EDIT, BACK_TO_MENU, SUBMIT_REQUEST_MESSAGE } = constants;
         const SUMMARY = getReqFromSessionStorage(requestItemName);
         let summaryMessage = `Your ${module.moduleName} summary:\n`;
+        console.log(SUMMARY);
         for (const key in SUMMARY) {
             if (SUMMARY.hasOwnProperty(key)) {
-                if (typeof SUMMARY[key].value !== "object") {
+                if (key === "attachment") {
+                    if (SUMMARY[key].value.length > 0) {
+                        summaryMessage += `Attachments:\n`;
+                        SUMMARY[key].value.forEach((file, index) => {
+                            SUMMARY[key].value.forEach((file, index) => {
+                                if (index !== SUMMARY[key].value.length - 1) {
+                                    summaryMessage += `${file.fileName},\n`;
+                                } else {
+                                    summaryMessage += `${file.fileName}`;
+                                }
+                            });
+                        });
+                    }
+                } else if (typeof SUMMARY[key].value !== "object") {
                     summaryMessage += `${SUMMARY[key].name}: ${SUMMARY[key].value}\n`;
+                } else if (SUMMARY[key].value.location) {
+                    summaryMessage += `Deputize from: ${SUMMARY[key].value.location}\n`;
+                    summaryMessage += `Deputize: ${SUMMARY[key].value.deputize}\n`;
                 } else {
                     // in case of attachment
                     summaryMessage += `${SUMMARY[key].name}: ${SUMMARY[key].value.fileName}\n`;
@@ -942,7 +1181,7 @@ const moduleRequest = {
             insertValue,
             insertSummary,
             insertFetchedOptions,
-            insertAttachmentOptionWithSubOptions,
+            insertDoubleChosenSelect,
             insertOptions,
         } = messageHandler;
 
@@ -957,7 +1196,7 @@ const moduleRequest = {
                 await insertChosenSelect(module, step);
                 break;
             case "doubleDropDown":
-                await insertDoubleChosenSelect(module, step, editMessage, true, value);
+                await insertDoubleChosenSelect(module, step);
                 break;
             case "attachments":
                 await insertAttachmentOption(module, step);
@@ -982,6 +1221,7 @@ const moduleRequest = {
             insertValue,
             insertSummary,
             insertOptions,
+            insertDoubleChosenSelect,
         } = messageHandler;
         switch (type) {
             case "date":
@@ -1024,7 +1264,7 @@ const moduleRequest = {
         }
 
         const SUBMIT_BTN = $("<button>")
-            .addClass("module-edit-form__submit-btn")
+            .addClass("to-right-btn")
             .attr("type", "submit")
             .text("Save");
 
