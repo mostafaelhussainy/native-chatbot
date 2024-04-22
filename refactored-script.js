@@ -38,7 +38,7 @@ const constants = {
     YES: "Yes",
     NO: "No",
     CHAT_INPUT_INITIAL_HEIGHT: elements.chatInput.scrollHeight,
-    TYPING_SPEED: 0,
+    TYPING_SPEED: 20,
 };
 
 const icons = {
@@ -87,98 +87,98 @@ const requestModules = {
         moduleLabel: "Apply for leave",
         totalStepsNum: 7,
         moduleSteps: {
-            // step1: {
-            //     defaultOption: "Select one option",
-            //     message: "Are you going abroad?",
-            //     type: "options",
-            //     name: "going abroad",
-            //     key: "goingAbroad",
-            //     stepNum: 1,
-            //     options: [
-            //         { value: "Yes", text: "Yes" },
-            //         { value: "No", text: "No" },
-            //     ],
-            // },
-            // step2: {
-            //     defaultOption: "Select one option",
-            //     message: "Do you need advanced payment?",
-            //     type: "options",
-            //     name: "advanced payment",
-            //     key: "advancedPayment",
-            //     stepNum: 2,
-            //     options: [
-            //         { value: "Yes", text: "Yes" },
-            //         { value: "No", text: "No" },
-            //     ],
-            // },
-            // step3: {
-            //     type: "date",
-            //     name: "starting date",
-            //     message: "Pick your starting date",
-            //     key: "startingDate",
-            //     stepNum: 3,
-            // },
-            // step4: {
-            //     message: "Please enter your number of days",
-            //     placeHolder: "Enter your number of days",
-            //     type: "value",
-            //     name: "number of days",
-            //     key: "numberOfDays",
-            //     stepNum: 4,
-            // },
-            // step5: {
-            //     defaultOption: "Select one option",
-            //     message: "Please choose your leave type",
-            //     type: "dropDown",
-            //     name: "leave type",
-            //     key: "leaveType",
-            //     stepNum: 5,
-            //     options: [
-            //         { value: "Type 1", text: "Type 1" },
-            //         { value: "Type 2", text: "Type 2" },
-            //         { value: "Type 3", text: "Type 3" },
-            //     ],
-            // },
             step1: {
+                defaultOption: "Select one option",
+                message: "Are you going abroad?",
+                type: "options",
+                name: "going abroad",
+                key: "goingAbroad",
+                stepNum: 1,
+                options: [
+                    { value: "Yes", text: "Yes" },
+                    { value: "No", text: "No" },
+                ],
+            },
+            step2: {
+                defaultOption: "Select one option",
+                message: "Do you need advanced payment?",
+                type: "options",
+                name: "advanced payment",
+                key: "advancedPayment",
+                stepNum: 2,
+                options: [
+                    { value: "Yes", text: "Yes" },
+                    { value: "No", text: "No" },
+                ],
+            },
+            step3: {
+                type: "date",
+                name: "starting date",
+                message: "Pick your starting date",
+                key: "startingDate",
+                stepNum: 3,
+            },
+            step4: {
+                message: "Please enter your number of days",
+                placeHolder: "Enter your number of days",
+                type: "value",
+                name: "number of days",
+                key: "numberOfDays",
+                stepNum: 4,
+            },
+            step5: {
+                defaultOption: "Select one option",
+                message: "Please choose your leave type",
+                type: "dropDown",
+                name: "leave type",
+                key: "leaveType",
+                stepNum: 5,
+                options: [
+                    { value: "Type 1", text: "Type 1" },
+                    { value: "Type 2", text: "Type 2" },
+                    { value: "Type 3", text: "Type 3" },
+                ],
+            },
+            step6: {
                 message: "Do you want to upload any attachments?",
                 type: "attachments",
                 name: "attachment name",
                 key: "attachmentName",
                 maxNumberOfAttachments: 3,
-                stepNum: 1,
+                stepNum: 6,
             },
-            // step7: {
-            //     message: `Since you're ${constants.AST_VALUE} please deputize your approvals?`,
-            //     type: "doubleDropDown",
-            //     name: "deputize type",
-            //     key: "deputizeType",
-            //     stepNum: 7,
-            //     options: [
-            //         {
-            //             value: "All locations",
-            //             text: "All locations",
-            //             subOptions: [
-            //                 { value: "Option 1", text: "Option 1" },
-            //                 { value: "Option 2", text: "Option 2" },
-            //                 { value: "Option 3", text: "Option 3" },
-            //             ],
-            //         },
-            //         {
-            //             value: "Same location",
-            //             text: "Same location",
-            //             subOptions: [
-            //                 { value: "Option 4", text: "Option 4" },
-            //                 { value: "Option 5", text: "Option 5" },
-            //                 { value: "Option 6", text: "Option 6" },
-            //             ],
-            //         },
-            //         {
-            //             value: "My manager",
-            //             text: "My manager",
-            //             subOptions: [],
-            //         },
-            //     ],
-            // },
+            step7: {
+                message: `Since you're ${constants.AST_VALUE} please deputize your approvals?`,
+                type: "doubleDropDown",
+                name: "deputize type",
+                key: "deputizeType",
+                stepNum: 7,
+                options: [
+                    {
+                        value: "All locations",
+                        text: "All locations",
+                        subOptions: [
+                            { value: "Option 1", text: "Option 1" },
+                            { value: "Option 2", text: "Option 2" },
+                            { value: "Option 3", text: "Option 3" },
+                        ],
+                    },
+                    {
+                        value: "Same location",
+                        text: "Same location",
+                        subOptions: [
+                            { value: "Option 4", text: "Option 4" },
+                            { value: "Option 5", text: "Option 5" },
+                            { value: "Option 6", text: "Option 6" },
+                        ],
+                    },
+                    {
+                        value: "My manager",
+                        text: "My manager",
+                        subOptions: [],
+                    },
+                ],
+            },
         },
     },
 };
@@ -537,12 +537,13 @@ const messageHandler = {
     },
 
     insertOptions: async (module, step, positionElement, isEdit, value) => {
+        debugger;
         if (isEdit) {
             await messageHandler.insertChosenSelect(module, step, positionElement, isEdit, value);
         } else {
             const STEP_KEY = `step${step}`;
             const { insertMessage, insertOptionsDiv, insertButton } = messageHandler;
-            const { options, message, key } = module.moduleSteps[STEP_KEY];
+            const { options, message, key, name } = module.moduleSteps[STEP_KEY];
 
             const BOT_MESSAGE = await insertMessage(message, "incoming with-options");
             const OPTIONS_DIV = await insertOptionsDiv(BOT_MESSAGE);
@@ -550,11 +551,12 @@ const messageHandler = {
             messageHandler.insertStepValue(BOT_MESSAGE, module, step);
             options.forEach(async (option) => {
                 await insertButton(OPTIONS_DIV, option.text, () => {
+                    debugger;
                     const val = option.value;
                     utils.savePropToSessionStorage(
                         module.moduleKey,
                         key,
-                        val,
+                        name,
                         "dropDown",
                         val,
                         step
